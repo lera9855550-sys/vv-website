@@ -1,0 +1,108 @@
+/* Contact page (Figma: Contact page Desktop / Contact page Mob) */
+
+.contact-main {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 144px var(--pad-x) 60px; /* 84px header offset + 60px frame padding */
+  background: var(--bg-dark);
+}
+
+.contact-intro {
+  width: 848px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.contact-intro__heading { display: flex; flex-direction: column; gap: 16px; }
+.contact-intro__desc {
+  max-width: 678px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.36px;
+  color: var(--white-60);
+}
+
+/* Form */
+.contact-form { display: flex; flex-direction: column; gap: 32px; }
+.contact-form__fields { display: flex; flex-direction: column; gap: 20px; }
+.contact-form__row { display: flex; gap: 12px; }
+.contact-form__row .field { flex: 1; min-width: 0; }
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field__label {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.48px;
+  color: var(--white-40);
+}
+.field__label--caps { font-weight: 300; text-transform: uppercase; }
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  padding: 16px;
+  border-radius: 4px;
+  background: #262626;
+  border: 1px solid #323232;
+  font-family: var(--font);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.6px;
+  color: #fff;
+  outline: none;
+}
+.field input::placeholder,
+.field textarea::placeholder { color: rgba(255, 255, 255, 0.3); }
+.field input:focus,
+.field textarea:focus,
+.field select:focus { border-color: var(--accent-text); }
+.field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+.field--select { gap: 4px; }
+.field--select .field__control { position: relative; }
+.field select {
+  border: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 56px;
+}
+.field--select .field__chevron {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.contact-form .btn {
+  width: 100%;
+  border: 1px solid var(--border-light);
+}
+.contact-form .btn span:first-child { font-weight: 600; }
+
+/* Testimonial panel */
+.contact-aside { width: 337px; flex-shrink: 0; }
+.contact-aside .testimonial__quote { color: #fff; }
+
+/* Mobile */
+@media (max-width: 900px) {
+  .contact-main {
+    flex-direction: column;
+    gap: 80px;
+    padding: 164px var(--pad-x) 120px;
+  }
+  .contact-intro { width: 100%; }
+  .contact-intro .section-title { font-size: 40px; letter-spacing: -2.4px; }
+  .contact-form__row { flex-direction: column; gap: 20px; }
+  .contact-aside { width: 100%; }
+}
