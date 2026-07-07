@@ -59,8 +59,10 @@ if (servicesWrap && serviceItems.length) {
     currentService = i;
     serviceItems.forEach((li, n) => li.classList.toggle("is-active", n === i));
     serviceImgs.forEach((img, n) => img.classList.toggle("is-visible", n === i));
-    // mobile draws the active image on the list ::after via this custom property
-    const src = serviceImgs[i]?.getAttribute("src");
+    // mobile draws the active image on the list ::after via this custom property.
+    // Use the absolute .src (not the relative attribute) — a relative url() inside a custom
+    // property resolves against the stylesheet (/css/), which would 404 on assets/…
+    const src = serviceImgs[i]?.src;
     if (src) servicesWrap.style.setProperty("--svc-img", `url("${src}")`);
   };
 

@@ -355,9 +355,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   transition: opacity 0.5s ease;
   pointer-events: none;
 }
-.work-card:hover .work-card__media img { transform: scale(1.08); filter: blur(8px); }
-.work-card:hover .work-card__media::after { opacity: 1; }
-/* hover: white preview panel (placeholder for a short project animation) */
+/* white preview panel — hidden by default; only shown on real hover (desktop) */
 .work-card__preview {
   position: absolute;
   z-index: 2;
@@ -374,7 +372,6 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   transition: opacity 0.45s ease, transform 0.45s ease;
   pointer-events: none;
 }
-.work-card:hover .work-card__preview { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
 .work-card__caption {
   display: flex;
@@ -386,8 +383,10 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   display: flex;
   align-items: center;
   gap: 16px;
+  overflow: hidden; /* never let the hover caption spill past the card edge */
 }
 .work-card__name {
+  flex-shrink: 0; /* keep the highlighted name intact; the description shrinks instead */
   font-size: 24px;
   font-weight: 500;
   line-height: 1;
@@ -395,9 +394,10 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   color: #000;
   transition: background 0.25s ease;
 }
-.work-card:hover .work-card__name { background: var(--accent); }
-/* hover: bullet + project description appear next to the name */
+/* bullet + description are a hover-only extra — fully removed (not just transparent) so
+   they don't reserve width and overflow on touch screens */
 .work-card__dot {
+  display: none;
   width: 8px;
   height: 8px;
   flex-shrink: 0;
@@ -406,6 +406,10 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   transition: opacity 0.25s ease;
 }
 .work-card__desc {
+  display: none;
+  min-width: 0; /* allow it to shrink below its text width so the ellipsis kicks in */
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 24px;
   font-weight: 500;
   line-height: 1;
@@ -415,8 +419,19 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   opacity: 0;
   transition: opacity 0.25s ease;
 }
-.work-card:hover .work-card__dot,
-.work-card:hover .work-card__desc { opacity: 1; }
+
+/* Hover state lives on desktop only (real pointer) — never triggers on a tap, so nothing
+   blurs/expands or overflows on mobile. */
+@media (hover: hover) {
+  .work-card__dot,
+  .work-card__desc { display: block; }
+  .work-card:hover .work-card__media img { transform: scale(1.08); filter: blur(8px); }
+  .work-card:hover .work-card__media::after { opacity: 1; }
+  .work-card:hover .work-card__preview { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .work-card:hover .work-card__name { background: var(--accent); }
+  .work-card:hover .work-card__dot,
+  .work-card:hover .work-card__desc { opacity: 1; }
+}
 .work-card__tags {
   font-size: 18px;
   font-weight: 500;
@@ -1095,11 +1110,16 @@ body.menu-open { overflow: hidden; }
 
   /* Services — pinned scrollytelling on mobile too (section pins, cycles 4 services +
      images on scroll like desktop); the testimonial stays below within the pinned view.
-     .services__sticky inherits the desktop pin (sticky, 100vh, centered) — no override. */
+     Top-aligned (not centered) with design-proportional gaps (title↔list : list↔testimonial
+     ≈ 1:2, like Figma's 80/160) — as generous as fits the pinned viewport. */
   .services { height: 300vh; }
-  .services__inner { flex-direction: column-reverse; gap: 40px; }
+  .services__sticky {
+    align-items: flex-start; /* top-align like the design instead of vertical-centering */
+    padding: 56px var(--pad-x) 0;
+  }
+  .services__inner { flex-direction: column-reverse; gap: 64px; } /* list ↔ testimonial */
   .section-title { font-size: 40px; letter-spacing: -2.4px; }
-  .services__body { gap: 24px; }
+  .services__body { gap: 40px; } /* title ↔ list */
   /* Figma mobile (511:296): 56px list; the active service (white) cuts through the image
      via mix-blend-difference, inactive items #2e2e2e. Active item driven by JS (.is-active). */
   .services__list {
