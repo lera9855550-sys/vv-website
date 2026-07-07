@@ -373,6 +373,21 @@ if (servicesSection && servicesMedia && motionOK && finePointer) {
   });
 }
 
+// Touch devices: scroll-driven "hover" for work cards — a card crossing the middle band
+// of the viewport gets .is-hovered (blur + preview panel + caption), released on exit.
+if (window.matchMedia("(hover: none)").matches) {
+  const workCards = document.querySelectorAll(".work-card");
+  if (workCards.length) {
+    const ioHover = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => en.target.classList.toggle("is-hovered", en.isIntersecting));
+      },
+      { rootMargin: "-38% 0px -38% 0px", threshold: 0 } // active while inside the middle ~24% of the screen
+    );
+    workCards.forEach((c) => ioHover.observe(c));
+  }
+}
+
 // Pixel cursor follower
 if (motionOK && finePointer) {
   const dot = document.createElement("div");

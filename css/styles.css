@@ -1340,3 +1340,19 @@ body.menu-open { overflow: hidden; }
   .cursor-dot { display: none; }
   .page-fade { display: none; }
 }
+
+/* Touch devices: scroll-driven hover for work cards — JS adds .is-hovered when a card
+   crosses the middle of the viewport, mirroring the desktop hover state. */
+@media (hover: none) {
+  /* keep these in flow so opacity can animate (they're display:none on touch otherwise);
+     ellipsis clipping already prevents overflow */
+  .work-card__dot,
+  .work-card__desc { display: block; }
+
+  .work-card.is-hovered .work-card__media img { transform: scale(1.08); filter: blur(8px); }
+  .work-card.is-hovered .work-card__media::after { opacity: 1; }
+  .work-card.is-hovered .work-card__preview { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .work-card.is-hovered .work-card__name { background: var(--accent); }
+  .work-card.is-hovered .work-card__dot,
+  .work-card.is-hovered .work-card__desc { opacity: 1; }
+}
