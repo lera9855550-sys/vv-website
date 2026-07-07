@@ -88,7 +88,7 @@
       <div class="statement__body">
         <h2 class="statement__text">Most startups outgrow their visual presence before they notice. We handle web, UI/UX, motion, and 3D&nbsp;— so the outside finally matches the inside.</h2>
         <div class="person">
-          <span class="person__avatar"><img src="assets/avatar.png" alt="Vova Ferrari"></span>
+          <span class="person__avatar"><img src="assets/avatar.png" alt="Vova Ferrari" loading="lazy"></span>
           <p class="person__meta">Vova Ferrari :)<br>Founder V+V Gallery</p>
         </div>
       </div>
@@ -100,30 +100,58 @@
     <h2 class="section-title">Selected Work</h2>
     <div class="work__grid">
       <a class="work-card" href="#">
-        <span class="work-card__media"><img src="assets/project-img.jpg" alt="CHR Innovations project"></span>
+        <span class="work-card__media">
+          <img src="assets/project-img.jpg" alt="CHR Innovations project" loading="lazy">
+          <span class="work-card__preview" aria-hidden="true"></span>
+        </span>
         <span class="work-card__caption">
-          <span class="work-card__name">Project Name</span>
+          <span class="work-card__head">
+            <span class="work-card__name">Project Name</span>
+            <span class="work-card__dot" aria-hidden="true"></span>
+            <span class="work-card__desc">Some words about the project</span>
+          </span>
           <span class="work-card__tags">Branding, E-commerce</span>
         </span>
       </a>
       <a class="work-card" href="#">
-        <span class="work-card__media"><img src="assets/project-img.jpg" alt="CHR Innovations project"></span>
+        <span class="work-card__media">
+          <img src="assets/project-img.jpg" alt="CHR Innovations project" loading="lazy">
+          <span class="work-card__preview" aria-hidden="true"></span>
+        </span>
         <span class="work-card__caption">
-          <span class="work-card__name">Project Name</span>
+          <span class="work-card__head">
+            <span class="work-card__name">Project Name</span>
+            <span class="work-card__dot" aria-hidden="true"></span>
+            <span class="work-card__desc">Some words about the project</span>
+          </span>
           <span class="work-card__tags">Branding, E-commerce</span>
         </span>
       </a>
       <a class="work-card" href="#">
-        <span class="work-card__media"><img src="assets/project-img.jpg" alt="CHR Innovations project"></span>
+        <span class="work-card__media">
+          <img src="assets/project-img.jpg" alt="CHR Innovations project" loading="lazy">
+          <span class="work-card__preview" aria-hidden="true"></span>
+        </span>
         <span class="work-card__caption">
-          <span class="work-card__name">Project Name</span>
+          <span class="work-card__head">
+            <span class="work-card__name">Project Name</span>
+            <span class="work-card__dot" aria-hidden="true"></span>
+            <span class="work-card__desc">Some words about the project</span>
+          </span>
           <span class="work-card__tags">Branding, E-commerce</span>
         </span>
       </a>
       <a class="work-card" href="#">
-        <span class="work-card__media"><img src="assets/project-img.jpg" alt="CHR Innovations project"></span>
+        <span class="work-card__media">
+          <img src="assets/project-img.jpg" alt="CHR Innovations project" loading="lazy">
+          <span class="work-card__preview" aria-hidden="true"></span>
+        </span>
         <span class="work-card__caption">
-          <span class="work-card__name">Project Name</span>
+          <span class="work-card__head">
+            <span class="work-card__name">Project Name</span>
+            <span class="work-card__dot" aria-hidden="true"></span>
+            <span class="work-card__desc">Some words about the project</span>
+          </span>
           <span class="work-card__tags">Branding, E-commerce</span>
         </span>
       </a>
@@ -190,10 +218,10 @@
       </div>
     </div>
     <div class="services__media">
-      <img src="assets/project-img.jpg" class="is-visible" alt="">
-      <img src="assets/step3-card.png" alt="">
-      <img src="assets/step2-card.png" alt="">
-      <img src="assets/step4-card.png" alt="">
+      <img src="assets/project-img.jpg" class="is-visible" alt="" loading="lazy">
+      <img src="assets/step3-card.png" alt="" loading="lazy">
+      <img src="assets/step2-card.png" alt="" loading="lazy">
+      <img src="assets/step4-card.png" alt="" loading="lazy">
     </div>
     </div>
   </section>
@@ -212,7 +240,11 @@
           </div>
           <p class="process-step__desc">We get into your business — your product, your market, your ambition. No templates, no assumptions. We leave with a clear picture of what needs to change and why.</p>
         </div>
-        <div class="process-step__media"><img src="assets/step1-card.png" alt=""></div>
+        <div class="process-step__media">
+          <video src="assets/step1.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <span class="process-step__tint" aria-hidden="true"></span>
+          <span class="process-step__pattern" aria-hidden="true"></span>
+        </div>
       </article>
       <article class="process-step">
         <p class="process-step__label">[ step 2 ]</p>
@@ -223,7 +255,11 @@
           </div>
           <p class="process-step__desc">We define the visual language before touching a single screen. Typography, color, motion logic, spatial hierarchy. Everything gets locked before execution begins.</p>
         </div>
-        <div class="process-step__media"><img src="assets/step2-card.png" alt=""></div>
+        <div class="process-step__media">
+          <video src="assets/step2.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <span class="process-step__tint" aria-hidden="true"></span>
+          <span class="process-step__pattern" aria-hidden="true"></span>
+        </div>
       </article>
       <article class="process-step">
         <p class="process-step__label">[ step 3 ]</p>
@@ -234,7 +270,11 @@
           </div>
           <p class="process-step__desc">Web, UI/UX, motion, 3D — built as a system, not a collection of screens. Every frame is designed to perform, not just to impress.</p>
         </div>
-        <div class="process-step__media"><img src="assets/step3-card.png" alt=""></div>
+        <div class="process-step__media">
+          <video src="assets/step3.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <span class="process-step__tint" aria-hidden="true"></span>
+          <span class="process-step__pattern" aria-hidden="true"></span>
+        </div>
       </article>
       <article class="process-step">
         <p class="process-step__label">[ step 4 ]</p>
@@ -245,7 +285,11 @@
           </div>
           <p class="process-step__desc">You get the assets, the files, and the handoff documentation. No loose ends. No "figure it out yourself."</p>
         </div>
-        <div class="process-step__media"><img src="assets/step4-card.png" alt=""></div>
+        <div class="process-step__media">
+          <video src="assets/step4.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <span class="process-step__tint" aria-hidden="true"></span>
+          <span class="process-step__pattern" aria-hidden="true"></span>
+        </div>
       </article>
     </div>
   </section>

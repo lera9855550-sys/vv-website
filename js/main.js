@@ -1,6 +1,29 @@
 const motionOK = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const finePointer = window.matchMedia("(pointer: fine)").matches;
 
+// Expose the scrollbar width so --pad-x can center content precisely (no scrollbar offset)
+const setScrollbarWidth = () => {
+  const sbw = window.innerWidth - document.documentElement.clientWidth;
+  document.documentElement.style.setProperty("--sbw", Math.max(0, sbw) + "px");
+};
+setScrollbarWidth();
+window.addEventListener("resize", setScrollbarWidth);
+
+// In-page anchor links: smooth-scroll to the section (the wheel-damping module sets
+// scroll-behavior:auto, which would otherwise make these jump instantly). Bare "#"
+// placeholder links do nothing instead of jerking the page to the top.
+document.addEventListener("click", (e) => {
+  const link = e.target.closest('a[href^="#"]');
+  if (!link) return;
+  const href = link.getAttribute("href");
+  if (href === "#") { e.preventDefault(); return; } // placeholder — don't jump to top
+  const target = document.querySelector(href);
+  if (!target) return;
+  e.preventDefault();
+  target.scrollIntoView({ behavior: motionOK ? "smooth" : "auto", block: "start" });
+  history.replaceState(null, "", href);
+});
+
 // Sliders ([ 01 / 04 ] counter + prev/next arrows + progress rule)
 document.querySelectorAll(".side-panel").forEach((panel) => {
   const slidesWrap = panel.querySelector("[data-slides]");
@@ -36,10 +59,13 @@ if (servicesWrap && serviceItems.length) {
     currentService = i;
     serviceItems.forEach((li, n) => li.classList.toggle("is-active", n === i));
     serviceImgs.forEach((img, n) => img.classList.toggle("is-visible", n === i));
+    // mobile draws the active image on the list ::after via this custom property
+    const src = serviceImgs[i]?.getAttribute("src");
+    if (src) servicesWrap.style.setProperty("--svc-img", `url("${src}")`);
   };
 
+  // runs on both desktop and mobile — the section pins and cycles services on scroll
   const onServicesScroll = () => {
-    if (window.innerWidth <= 900) return;
     const total = servicesWrap.offsetHeight - window.innerHeight;
     const passed = -servicesWrap.getBoundingClientRect().top;
     const p = Math.min(1, Math.max(0, passed / total));
@@ -48,13 +74,6 @@ if (servicesWrap && serviceItems.length) {
 
   window.addEventListener("scroll", onServicesScroll, { passive: true });
   onServicesScroll();
-
-  // mobile fallback: tap highlights a service
-  serviceItems.forEach((li, i) =>
-    li.addEventListener("click", () => {
-      if (window.innerWidth <= 900) setService(i);
-    })
-  );
 }
 
 // Mobile menu (full-screen overlay, Figma "Menu Mob")
@@ -79,7 +98,9 @@ document.addEventListener("keydown", (e) => {
 
 // FAQ: smooth accordion via CSS grid-rows (0fr↔1fr). Keep <details> natively open so the
 // content is always in flow; the collapse is purely the grid transition off .is-open.
-document.querySelectorAll(".faq__item").forEach((item) => {
+// Single-open: opening one question closes any other that's open.
+const faqItems = [...document.querySelectorAll(".faq__item")];
+faqItems.forEach((item, idx) => {
   const summary = item.querySelector("summary");
   const answer = item.querySelector(".faq__answer");
   if (!summary || !answer) return;
@@ -95,14 +116,46 @@ document.querySelectorAll(".faq__item").forEach((item) => {
     answer.appendChild(clip);
   }
 
-  item.classList.toggle("is-open", item.open); // reflect initial state; drives the whole animation
+  // start with only the first item open (max one at a time)
+  item.classList.toggle("is-open", idx === 0);
   item.open = true; // keep content laid out; visibility is controlled by .is-open only
 
   summary.addEventListener("click", (e) => {
     e.preventDefault();
-    item.classList.toggle("is-open");
+    const willOpen = !item.classList.contains("is-open");
+    faqItems.forEach((other) => other.classList.remove("is-open")); // close everything
+    if (willOpen) item.classList.add("is-open"); // then open the clicked one (if it was closed)
+    syncFaqAria();
   });
 });
+
+// a11y: hide collapsed answers from screen readers so they don't announce every answer,
+// and reflect the open/closed state on each question button.
+function syncFaqAria() {
+  faqItems.forEach((item) => {
+    const open = item.classList.contains("is-open");
+    const summary = item.querySelector("summary");
+    const answer = item.querySelector(".faq__answer");
+    summary?.setAttribute("aria-expanded", String(open));
+    answer?.setAttribute("aria-hidden", String(!open));
+  });
+}
+syncFaqAria();
+
+// Contact page: the mobile sticky submit button tucks away once the form is scrolled
+// past (the testimonial panel comes into view), so it doesn't cover the footer/testimonial.
+const stickySubmit = document.querySelector(".contact-form .btn");
+const contactAside = document.querySelector(".contact-aside");
+if (stickySubmit && contactAside) {
+  const updateSticky = () => {
+    // tuck the button away as the testimonial panel starts entering from the bottom
+    const asideTop = contactAside.getBoundingClientRect().top;
+    stickySubmit.classList.toggle("is-tucked", asideTop < window.innerHeight - 40);
+  };
+  window.addEventListener("scroll", updateSticky, { passive: true });
+  window.addEventListener("resize", updateSticky);
+  updateSticky();
+}
 
 // Live Kyiv clock in the footer
 const timeEl = document.querySelector("[data-kyiv-time]");
@@ -186,7 +239,8 @@ if (motionOK) {
   prep(".footer__contact");
   prep(".contact-intro__heading");
   prep(".contact-form .field", { stagger: 70 });
-  prep(".contact-form .btn");
+  // note: .contact-form .btn is intentionally NOT revealed — on mobile it's a fixed
+  // bottom button, and the reveal's opacity/translate would fight the fixed positioning
   prep(".contact-aside");
 }
 

@@ -105,4 +105,23 @@
   .contact-intro .section-title { font-size: 40px; letter-spacing: -2.4px; }
   .contact-form__row { flex-direction: column; gap: 20px; }
   .contact-aside { width: 100%; }
+
+  /* Sticky submit button pinned to the bottom of the screen while filling the form */
+  .contact-form { padding-bottom: 88px; } /* room so the last field clears the fixed button */
+  .contact-form .btn {
+    position: fixed;
+    left: var(--pad-x);
+    right: var(--pad-x);
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    z-index: 40; /* under the mobile menu overlay (100) */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  /* tuck it away once the form is scrolled past (testimonials/footer in view) */
+  .contact-form .btn.is-tucked {
+    transform: translateY(160%);
+    opacity: 0;
+    pointer-events: none;
+  }
 }

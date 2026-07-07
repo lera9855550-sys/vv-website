@@ -15,7 +15,11 @@
   --white-40: rgba(255, 255, 255, 0.4);
   --black-60: rgba(0, 0, 0, 0.6);
   --black-40: rgba(0, 0, 0, 0.4);
-  --pad-x: 40px;
+  /* 40px gutters up to 1440; beyond that the gutters grow so content caps at ~1360px
+     (the design width) and stays centered instead of stretching across huge screens.
+     --sbw (set by JS) subtracts the scrollbar width so content stays perfectly centered. */
+  --sbw: 0px;
+  --pad-x: max(40px, calc((100vw - var(--sbw) - 1360px) / 2));
   --font: "Geist", -apple-system, sans-serif;
 }
 
@@ -107,16 +111,14 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   height: 60px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 24px;
   padding: 0 var(--pad-x);
   z-index: 10;
 }
 .logo { width: 93px; height: 32px; flex-shrink: 0; }
 .logo img { width: 100%; height: 100%; }
 .menu {
-  position: absolute;
-  left: 553px;
-  top: 50%;
-  transform: translateY(-50%);
   display: flex;
   gap: 24px;
   font-size: 16px;
@@ -125,20 +127,23 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 }
 .menu a { opacity: 1; transition: opacity 0.15s ease; }
 .menu a:hover { opacity: 0.6; }
-.header__cta { width: 334px; margin-left: auto; }
+.header__cta { width: 334px; flex-shrink: 0; }
 .menu-toggle { display: none; }
 
 /* ============ Hero ============ */
 .hero {
   position: relative;
-  height: 700px;
+  height: 100vh;
+  height: 100dvh; /* exactly one screen; dvh tracks the visible viewport (mobile browser chrome) */
+  min-height: 600px; /* floor so content never crushes into the header on very short windows */
   background: var(--bg-hero) url("../assets/hero-bg.jpg") center / cover no-repeat;
   overflow: hidden;
 }
 .hero__title {
   position: absolute;
   left: var(--pad-x);
-  top: 386px;
+  top: auto;
+  bottom: 110px; /* anchored to the bottom-left so it holds its place at any viewport height */
   font-size: 80px;
   font-weight: 400;
   line-height: 0.85;
@@ -149,7 +154,8 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 .hero__subtitle {
   position: absolute;
   left: var(--pad-x);
-  top: 622px;
+  top: auto;
+  bottom: 24px;
   width: 338px;
   font-size: 18px;
   font-weight: 500;
@@ -161,7 +167,8 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 .hero__card {
   position: absolute;
   right: var(--pad-x); /* flush to the right content edge, same as the header CTA (was a fragile left calc that drifted off 1440) */
-  top: 376px;
+  top: auto;
+  bottom: 24px;
   width: 358px;
   height: 300px;
   display: flex;
@@ -323,23 +330,62 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 }
 .work-card { display: flex; flex-direction: column; gap: 16px; }
 .work-card__media {
+  position: relative;
   height: 596px;
   border-radius: 8px;
   overflow: hidden;
   display: block;
 }
 .work-card__media img {
+  position: relative;
+  z-index: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.5s ease, filter 0.5s ease;
 }
-.work-card:hover .work-card__media img { transform: scale(1.04); }
+/* hover: blur + darken the image */
+.work-card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.work-card:hover .work-card__media img { transform: scale(1.08); filter: blur(8px); }
+.work-card:hover .work-card__media::after { opacity: 1; }
+/* hover: white preview panel (placeholder for a short project animation) */
+.work-card__preview {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.96);
+  width: 88%;
+  max-width: 600px;
+  aspect-ratio: 600 / 350;
+  max-height: 70%;
+  background: #fff;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  pointer-events: none;
+}
+.work-card:hover .work-card__preview { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
 .work-card__caption {
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 0 24px;
+}
+.work-card__head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 .work-card__name {
   font-size: 24px;
@@ -347,10 +393,30 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   line-height: 1;
   letter-spacing: -0.72px;
   color: #000;
-  align-self: flex-start;
-  transition: background 0.15s ease;
+  transition: background 0.25s ease;
 }
 .work-card:hover .work-card__name { background: var(--accent); }
+/* hover: bullet + project description appear next to the name */
+.work-card__dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.work-card__desc {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.72px;
+  color: #000;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.work-card:hover .work-card__dot,
+.work-card:hover .work-card__desc { opacity: 1; }
 .work-card__tags {
   font-size: 18px;
   font-weight: 500;
@@ -521,6 +587,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   color: var(--white-60);
 }
 .process-step__media {
+  position: relative;
   margin-left: auto;
   width: 507px;
   height: 350px;
@@ -528,15 +595,40 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   overflow: hidden;
   flex-shrink: 0;
 }
-.process-step__media img { width: 100%; height: 100%; object-fit: cover; }
+.process-step__media video,
+.process-step__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* green duotone overlay under the pattern (Figma "overlay color", color-burn) */
+.process-step__tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(-34deg, rgba(20, 33, 24, 0.48) 10%, rgba(117, 143, 72, 0.48) 74%);
+  mix-blend-mode: color-burn;
+}
+/* signature halftone pattern kept on top of the video (Figma FW_Cross overlay) */
+.process-step__pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url("../assets/cross-bitmap-small.jpg") center / cover no-repeat;
+  mix-blend-mode: soft-light;
+  opacity: 0.85;
+}
 
 /* ============ Pricing ============ */
 .pricing {
   background: #fff;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 40px;
+  column-gap: 0; /* columns sit at the edges via space-between (fits the capped 1360 width) */
+  row-gap: 60px; /* if they wrap on mid-size screens, this spaces the stacked columns */
   padding: 120px var(--pad-x) 180px;
 }
 .pricing__intro {
@@ -546,6 +638,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   flex-direction: column;
   gap: 32px;
   width: 507px;
+  flex-shrink: 0; /* wrap (stack) on mid-size screens instead of squishing */
 }
 .pricing__connect {
   display: flex;
@@ -560,6 +653,8 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 .pricing__connect img { width: 24px; height: 20px; }
 .pricing__content {
   width: 847px;
+  max-width: 100%;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 60px;
@@ -585,9 +680,8 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 .price-card--accent::before {
   content: "";
   position: absolute;
-  inset: -20px;
+  inset: -48px; /* headroom so the drift animation never exposes a bare edge */
   background: url("../assets/cross-bitmap-small.jpg") center / cover no-repeat;
-  transform: rotate(90deg);
   opacity: 0.2;
   mix-blend-mode: hard-light;
   pointer-events: none;
@@ -718,7 +812,6 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   inset: 0;
   background: url("../assets/cross-bitmap-small.jpg") center / cover no-repeat;
   mix-blend-mode: soft-light;
-  transform: rotate(90deg) scale(1.4);
   pointer-events: none;
 }
 .cta > * { position: relative; z-index: 1; }
@@ -970,13 +1063,13 @@ body.menu-open { overflow: hidden; }
   }
 
   /* Hero */
-  .hero { height: 800px; }
   .hero__title {
-    top: 264px;
+    top: auto;
+    bottom: 393px; /* bottom-anchored (from the 800px mobile reference) */
     font-size: 56px;
     letter-spacing: -3.36px;
   }
-  .hero__subtitle { top: 472px; width: 338px; }
+  .hero__subtitle { top: auto; bottom: 274px; width: 338px; }
   .hero__card {
     left: var(--pad-x);
     right: var(--pad-x);
@@ -1000,26 +1093,35 @@ body.menu-open { overflow: hidden; }
   .work-card__media { height: 358px; }
   .work-card__caption { padding: 0; }
 
-  /* Services */
-  .services { height: auto; }
-  .services__sticky {
-    position: static;
-    height: auto;
-    overflow: visible;
-    display: block;
-    padding: 80px var(--pad-x) 120px;
-  }
-  .services__inner { flex-direction: column-reverse; gap: 160px; }
+  /* Services — pinned scrollytelling on mobile too (section pins, cycles 4 services +
+     images on scroll like desktop); the testimonial stays below within the pinned view.
+     .services__sticky inherits the desktop pin (sticky, 100vh, centered) — no override. */
+  .services { height: 300vh; }
+  .services__inner { flex-direction: column-reverse; gap: 40px; }
   .section-title { font-size: 40px; letter-spacing: -2.4px; }
-  .services__body { gap: 80px; }
-  .services__list { font-size: 48px; letter-spacing: -2.88px; gap: 16px; }
-  .services__media {
-    top: 241px;
-    transform: none;
-    left: var(--pad-x);
-    right: var(--pad-x);
-    width: auto;
+  .services__body { gap: 24px; }
+  /* Figma mobile (511:296): 56px list; the active service (white) cuts through the image
+     via mix-blend-difference, inactive items #2e2e2e. Active item driven by JS (.is-active). */
+  .services__list {
+    position: relative;
+    font-size: 56px;
+    letter-spacing: -3.36px;
+    gap: 16px;
+    white-space: nowrap;
+  }
+  .services__media { display: none; } /* desktop overlay; mobile draws the image on ::after */
+  .services__list::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     height: 288px;
+    border-radius: 8px;
+    background: var(--svc-img, url("../assets/project-img.jpg")) center / cover no-repeat;
+    mix-blend-mode: difference;
+    pointer-events: none;
   }
 
   /* Process */
@@ -1112,10 +1214,12 @@ body.menu-open { overflow: hidden; }
 }
 .process-step.anim-lines.in-view:first-child::before,
 .process-step.anim-lines.in-view::after { transform: scaleX(1); }
+.process-step__media.anim-item video,
 .process-step__media.anim-item img {
   transform: scale(1.06);
   transition: transform 1.2s ease 0.15s;
 }
+.process-step__media.anim-item.in-view video,
 .process-step__media.anim-item.in-view img { transform: scale(1); }
 
 /* FAQ: smooth accordion (icon morph lives with the .faq__icon rules above) */
@@ -1141,8 +1245,8 @@ body.menu-open { overflow: hidden; }
   transform: none;
 }
 @keyframes cta-drift {
-  from { transform: rotate(90deg) scale(1.4) translate(0, 0); }
-  to { transform: rotate(90deg) scale(1.4) translate(1.5%, 1%); }
+  from { background-position: 50% 50%; }
+  to { background-position: 53% 52%; }
 }
 .cta::after { animation: cta-drift 22s ease-in-out infinite alternate; }
 
