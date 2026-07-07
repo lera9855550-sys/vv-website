@@ -610,23 +610,32 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   overflow: hidden;
   flex-shrink: 0;
 }
-.process-step__media video,
 .process-step__media img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+/* Videos reproduce the exact Figma framing (node 414:915): each clip is scaled and offset
+   inside the 507×350 card. Percentages of the card box, so the crop holds on mobile too
+   (the mobile card keeps the same 1.449 aspect). height:auto preserves the clip's ratio. */
+.process-step__media video {
+  position: absolute;
+  display: block;
+  height: auto;
+}
+.process-step:nth-child(1) .process-step__media video { width: 184.68%; left: -51.08%; bottom: -29.71%; }
+.process-step:nth-child(2) .process-step__media video { width: 144.16%; left: -1.18%; top: -1.43%; transform: scaleX(-1); }
+.process-step:nth-child(3) .process-step__media video { width: 117.16%; left: -16.77%; top: -27.71%; }
+.process-step:nth-child(4) .process-step__media video { width: 143.39%; left: 0; top: -37.14%; }
 /* green duotone overlay under the pattern (Figma "overlay color", color-burn) */
 .process-step__tint {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* multiply renders consistently across browsers (color-burn was ~2× stronger on iOS
-     Safari + oversaturated on the phone's P3 display); softer green so it doesn't
-     double up on the already green-graded footage */
-  background: linear-gradient(-34deg, rgba(34, 46, 30, 0.55) 10%, rgba(128, 150, 90, 0.4) 74%);
-  mix-blend-mode: multiply;
+  /* Figma "overlay color": green gradient, color-burn */
+  background: linear-gradient(-34deg, rgba(20, 33, 24, 0.48) 10%, rgba(117, 143, 72, 0.48) 74%);
+  mix-blend-mode: color-burn;
 }
 /* signature halftone pattern kept on top of the video (Figma FW_Cross overlay) */
 .process-step__pattern {
@@ -1237,12 +1246,11 @@ body.menu-open { overflow: hidden; }
 }
 .process-step.anim-lines.in-view:first-child::before,
 .process-step.anim-lines.in-view::after { transform: scaleX(1); }
-.process-step__media.anim-item video,
+/* settle-in zoom applies to images only — videos carry their own Figma framing transforms */
 .process-step__media.anim-item img {
   transform: scale(1.06);
   transition: transform 1.2s ease 0.15s;
 }
-.process-step__media.anim-item.in-view video,
 .process-step__media.anim-item.in-view img { transform: scale(1); }
 
 /* FAQ: smooth accordion (icon morph lives with the .faq__icon rules above) */
