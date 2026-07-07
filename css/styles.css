@@ -622,8 +622,11 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(-34deg, rgba(20, 33, 24, 0.48) 10%, rgba(117, 143, 72, 0.48) 74%);
-  mix-blend-mode: color-burn;
+  /* multiply renders consistently across browsers (color-burn was ~2× stronger on iOS
+     Safari + oversaturated on the phone's P3 display); softer green so it doesn't
+     double up on the already green-graded footage */
+  background: linear-gradient(-34deg, rgba(34, 46, 30, 0.55) 10%, rgba(128, 150, 90, 0.4) 74%);
+  mix-blend-mode: multiply;
 }
 /* signature halftone pattern kept on top of the video (Figma FW_Cross overlay) */
 .process-step__pattern {
