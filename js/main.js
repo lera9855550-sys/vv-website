@@ -388,27 +388,35 @@ if (window.matchMedia("(hover: none)").matches) {
   }
 }
 
-// Pixel cursor follower
+// Crosshair cursor: viewport-wide hairlines tracking the pointer + x/y readout
 if (motionOK && finePointer) {
-  const dot = document.createElement("div");
-  dot.className = "cursor-dot";
-  document.body.appendChild(dot);
-  let mx = -100, my = -100, dx = -100, dy = -100;
+  const cross = document.createElement("div");
+  cross.className = "cursor-cross";
+  cross.innerHTML =
+    '<span class="cursor-cross__x"></span>' +
+    '<span class="cursor-cross__y"></span>' +
+    '<span class="cursor-cross__label"></span>';
+  document.body.appendChild(cross);
+  const lineX = cross.querySelector(".cursor-cross__x");
+  const lineY = cross.querySelector(".cursor-cross__y");
+  const label = cross.querySelector(".cursor-cross__label");
+
+  let mx = -100, my = -100, cx = -100, cy = -100;
 
   window.addEventListener("mousemove", (e) => {
     mx = e.clientX;
     my = e.clientY;
-    dot.classList.add("is-visible");
+    cross.classList.add("is-visible");
   });
-  document.addEventListener("mouseleave", () => dot.classList.remove("is-visible"));
-  document.addEventListener("mouseover", (e) => {
-    dot.classList.toggle("is-active", !!e.target.closest("a, button, summary, select, input, textarea"));
-  });
+  document.addEventListener("mouseleave", () => cross.classList.remove("is-visible"));
 
   const follow = () => {
-    dx += (mx - dx) * 0.22;
-    dy += (my - dy) * 0.22;
-    dot.style.transform = `translate3d(${dx}px, ${dy}px, 0) translate(-50%, -50%)`;
+    cx += (mx - cx) * 0.35;
+    cy += (my - cy) * 0.35;
+    lineX.style.transform = `translateY(${cy}px)`;
+    lineY.style.transform = `translateX(${cx}px)`;
+    label.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+    label.textContent = `x:${Math.round(mx)} y:${Math.round(my)}`;
     requestAnimationFrame(follow);
   };
   follow();

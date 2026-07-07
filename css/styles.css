@@ -1298,21 +1298,44 @@ body.menu-open { overflow: hidden; }
 }
 .footer__band-row { position: relative; }
 
-/* Pixel cursor follower */
-.cursor-dot {
+/* Crosshair cursor: full-viewport hairlines meeting at the pointer + x/y readout.
+   difference blend keeps the lines visible on both dark and light sections. */
+.cursor-cross {
   position: fixed;
-  left: 0;
-  top: 0;
-  width: 10px;
-  height: 10px;
-  background: var(--accent);
+  inset: 0;
   z-index: 300;
   pointer-events: none;
+  mix-blend-mode: difference;
   opacity: 0;
-  transition: width 0.2s ease, height 0.2s ease, opacity 0.25s ease;
+  transition: opacity 0.25s ease;
 }
-.cursor-dot.is-visible { opacity: 1; }
-.cursor-dot.is-active { width: 26px; height: 26px; }
+.cursor-cross.is-visible { opacity: 1; }
+.cursor-cross__x {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.cursor-cross__y {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.cursor-cross__label {
+  position: absolute;
+  padding-left: 12px;
+  padding-top: 10px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+}
 
 /* Page transition fade */
 .page-fade {
@@ -1337,7 +1360,7 @@ body.menu-open { overflow: hidden; }
   .cta::after,
   .footer__band::before { animation: none; }
   .anim-item { opacity: 1; transform: none; transition: none; }
-  .cursor-dot { display: none; }
+  .cursor-cross { display: none; }
   .page-fade { display: none; }
 }
 
