@@ -1326,17 +1326,6 @@ body.menu-open { overflow: hidden; }
   width: 1px;
   background: rgba(255, 255, 255, 0.22);
 }
-.cursor-cross__label {
-  position: absolute;
-  padding-left: 12px;
-  padding-top: 10px;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
-  color: rgba(255, 255, 255, 0.4);
-  white-space: nowrap;
-}
-
 /* Page transition fade */
 .page-fade {
   position: fixed;

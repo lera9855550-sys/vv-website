@@ -388,18 +388,16 @@ if (window.matchMedia("(hover: none)").matches) {
   }
 }
 
-// Crosshair cursor: viewport-wide hairlines tracking the pointer + x/y readout
+// Crosshair cursor: viewport-wide hairlines tracking the pointer
 if (motionOK && finePointer) {
   const cross = document.createElement("div");
   cross.className = "cursor-cross";
   cross.innerHTML =
     '<span class="cursor-cross__x"></span>' +
-    '<span class="cursor-cross__y"></span>' +
-    '<span class="cursor-cross__label"></span>';
+    '<span class="cursor-cross__y"></span>';
   document.body.appendChild(cross);
   const lineX = cross.querySelector(".cursor-cross__x");
   const lineY = cross.querySelector(".cursor-cross__y");
-  const label = cross.querySelector(".cursor-cross__label");
 
   let mx = -100, my = -100, cx = -100, cy = -100;
 
@@ -415,8 +413,6 @@ if (motionOK && finePointer) {
     cy += (my - cy) * 0.35;
     lineX.style.transform = `translateY(${cy}px)`;
     lineY.style.transform = `translateX(${cx}px)`;
-    label.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
-    label.textContent = `x:${Math.round(mx)} y:${Math.round(my)}`;
     requestAnimationFrame(follow);
   };
   follow();
