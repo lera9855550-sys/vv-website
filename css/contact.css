@@ -111,7 +111,7 @@
   color: var(--white-40);
   cursor: pointer;
 }
-.contact-consent input { margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+.contact-consent input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--accent); flex-shrink: 0; }
 .contact-consent a { color: var(--accent-text); text-decoration: underline; }
 .contact-form__status {
   font-size: 14px;
