@@ -46,17 +46,13 @@ document.querySelectorAll(".side-panel").forEach((panel) => {
   show(0);
 });
 
-// Services: pinned section — scroll steps through services, highlighting each and swapping the photo
+// Services: hovering a service highlights it and reveals its photo (normal scroll, no pin)
 const servicesWrap = document.querySelector(".services");
 const serviceItems = document.querySelectorAll(".services__list li");
 const serviceImgs = document.querySelectorAll(".services__media img");
 
 if (servicesWrap && serviceItems.length) {
-  let currentService = 0;
-
-  const setService = (i) => {
-    if (i === currentService) return;
-    currentService = i;
+  const showService = (i) => {
     serviceItems.forEach((li, n) => li.classList.toggle("is-active", n === i));
     serviceImgs.forEach((img, n) => img.classList.toggle("is-visible", n === i));
     // mobile draws the active image on the list ::after via this custom property.
@@ -65,17 +61,17 @@ if (servicesWrap && serviceItems.length) {
     const src = serviceImgs[i]?.src;
     if (src) servicesWrap.style.setProperty("--svc-img", `url("${src}")`);
   };
-
-  // runs on both desktop and mobile — the section pins and cycles services on scroll
-  const onServicesScroll = () => {
-    const total = servicesWrap.offsetHeight - window.innerHeight;
-    const passed = -servicesWrap.getBoundingClientRect().top;
-    const p = Math.min(1, Math.max(0, passed / total));
-    setService(Math.min(serviceItems.length - 1, Math.floor(p * serviceItems.length)));
+  const clearService = () => {
+    serviceItems.forEach((li) => li.classList.remove("is-active"));
+    serviceImgs.forEach((img) => img.classList.remove("is-visible"));
   };
 
-  window.addEventListener("scroll", onServicesScroll, { passive: true });
-  onServicesScroll();
+  // mobile ::after has no hover — seed it with the first (absolute) image so it isn't blank
+  if (serviceImgs[0]?.src) servicesWrap.style.setProperty("--svc-img", `url("${serviceImgs[0].src}")`);
+
+  serviceItems.forEach((li, i) => li.addEventListener("mouseenter", () => showService(i)));
+  const servicesList = document.querySelector(".services__list");
+  if (servicesList) servicesList.addEventListener("mouseleave", clearService);
 }
 
 // Mobile menu (full-screen overlay, Figma "Menu Mob")
@@ -343,36 +339,6 @@ if (hero && motionOK) {
   );
 }
 
-// Services: preview image drifts toward the cursor (blend-difference makes it pop)
-const servicesSection = document.querySelector(".services");
-const servicesMedia = document.querySelector(".services__media");
-if (servicesSection && servicesMedia && motionOK && finePointer) {
-  let tx = 0, ty = 0, cx = 0, cy = 0, raf = null;
-  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-
-  const tick = () => {
-    cx += (tx - cx) * 0.08;
-    cy += (ty - cy) * 0.08;
-    servicesMedia.style.transform = `translate(${cx}px, calc(-50% + ${cy}px))`;
-    if (Math.abs(tx - cx) + Math.abs(ty - cy) > 0.4) raf = requestAnimationFrame(tick);
-    else raf = null;
-  };
-  const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
-
-  servicesSection.addEventListener("mousemove", (e) => {
-    if (window.innerWidth <= 900) return;
-    const r = servicesSection.getBoundingClientRect();
-    tx = clamp((e.clientX - r.left - r.width * 0.72) * 0.3, -320, 60);
-    ty = clamp((e.clientY - r.top - r.height * 0.5) * 0.25, -140, 140);
-    kick();
-  });
-  servicesSection.addEventListener("mouseleave", () => {
-    tx = 0;
-    ty = 0;
-    kick();
-  });
-}
-
 // Touch devices: scroll-driven "hover" for work cards — a card crossing the middle band
 // of the viewport gets .is-hovered (blur + preview panel + caption), released on exit.
 if (window.matchMedia("(hover: none)").matches) {
@@ -483,5 +449,54 @@ if (motionOK) {
     e.preventDefault();
     fade.classList.remove("is-out");
     setTimeout(() => (window.location.href = link.href), 380);
+  });
+}
+
+// Contact form → serverless endpoint (Vercel function `api/lead.js` forwards it to Telegram).
+// After deploying the function on Vercel, paste its URL below.
+const leadForm = document.getElementById("lead-form");
+if (leadForm) {
+  const LEAD_ENDPOINT = "https://REPLACE-ME.vercel.app/api/lead"; // ← paste your Vercel URL here
+  const statusEl = leadForm.querySelector("[data-form-status]");
+  const submitBtn = leadForm.querySelector("button[type=submit]");
+  const btnLabel = submitBtn && submitBtn.querySelector("span");
+
+  const setStatus = (msg, ok) => {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.classList.toggle("is-ok", ok === true);
+    statusEl.classList.toggle("is-err", ok === false);
+  };
+
+  leadForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setStatus("", null);
+    const data = Object.fromEntries(new FormData(leadForm));
+
+    if (!leadForm.consent || !leadForm.consent.checked)
+      return setStatus("Please agree to the processing of your data.", false);
+    if (!data.email || !data.email.includes("@"))
+      return setStatus("Please enter a valid email.", false);
+
+    submitBtn.disabled = true;
+    const original = btnLabel && btnLabel.textContent;
+    if (btnLabel) btnLabel.textContent = "Sending…";
+
+    try {
+      const res = await fetch(LEAD_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.ok) throw new Error();
+      leadForm.reset();
+      setStatus("Thanks! Your message has been sent — we'll be in touch.", true);
+    } catch {
+      setStatus("Couldn't send. Please try again, or email hello@email.com.", false);
+    } finally {
+      submitBtn.disabled = false;
+      if (btnLabel && original) btnLabel.textContent = original;
+    }
   });
 }

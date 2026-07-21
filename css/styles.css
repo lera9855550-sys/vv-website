@@ -344,6 +344,28 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   object-fit: cover;
   transition: transform 0.5s ease, filter 0.5s ease;
 }
+/* second cover shown on hover — a reduced panel floating over the blurred base image.
+   Selector is scoped to .work-card__media so it outranks `.work-card__media img`
+   (otherwise that rule's transition/height/z-index would win). */
+.work-card__media img.work-card__media-hover {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.96);
+  /* keep the hover cover's native proportions — no cropping. It scales down to fit
+     within the card (whichever of max-width/max-height binds first). */
+  width: auto;
+  height: auto;
+  max-width: 82%;
+  max-height: 76%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  z-index: 2; /* above the dark ::after overlay (z-index 1) */
+  opacity: 0;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  pointer-events: none;
+}
 /* hover: blur + darken the image */
 .work-card__media::after {
   content: "";
@@ -425,9 +447,9 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 @media (hover: hover) {
   .work-card__dot,
   .work-card__desc { display: block; }
-  .work-card:hover .work-card__media img { transform: scale(1.08); filter: blur(8px); }
+  .work-card:hover .work-card__media img:not(.work-card__media-hover) { transform: scale(1.08); filter: blur(8px); }
   .work-card:hover .work-card__media::after { opacity: 1; }
-  .work-card:hover .work-card__preview { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .work-card:hover .work-card__media img.work-card__media-hover { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   .work-card:hover .work-card__name { background: var(--accent); }
   .work-card:hover .work-card__dot,
   .work-card:hover .work-card__desc { opacity: 1; }
@@ -443,16 +465,11 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 /* ============ Services ============ */
 .services {
   position: relative;
-  height: 400vh; /* pinned scrollytelling: ~1 viewport of scroll per service */
 }
 .services__sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  position: relative;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  padding: 0 var(--pad-x);
+  padding: 160px var(--pad-x);
 }
 .services__inner { width: 100%; }
 .services__inner {
@@ -1124,10 +1141,8 @@ body.menu-open { overflow: hidden; }
      images on scroll like desktop); the testimonial stays below within the pinned view.
      Top-aligned (not centered) with design-proportional gaps (title↔list : list↔testimonial
      ≈ 1:2, like Figma's 80/160) — as generous as fits the pinned viewport. */
-  .services { height: 300vh; }
   .services__sticky {
-    align-items: flex-start; /* top-align like the design instead of vertical-centering */
-    padding: 56px var(--pad-x) 0;
+    padding: 80px var(--pad-x);
   }
   .services__inner { flex-direction: column-reverse; gap: 64px; } /* list ↔ testimonial */
   .section-title { font-size: 40px; letter-spacing: -2.4px; }
@@ -1361,9 +1376,9 @@ body.menu-open { overflow: hidden; }
   .work-card__dot,
   .work-card__desc { display: block; }
 
-  .work-card.is-hovered .work-card__media img { transform: scale(1.08); filter: blur(8px); }
+  .work-card.is-hovered .work-card__media img:not(.work-card__media-hover) { transform: scale(1.08); filter: blur(8px); }
   .work-card.is-hovered .work-card__media::after { opacity: 1; }
-  .work-card.is-hovered .work-card__preview { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .work-card.is-hovered .work-card__media img.work-card__media-hover { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   .work-card.is-hovered .work-card__name { background: var(--accent); }
   .work-card.is-hovered .work-card__dot,
   .work-card.is-hovered .work-card__desc { opacity: 1; }

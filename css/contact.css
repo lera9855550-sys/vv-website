@@ -89,6 +89,37 @@
   border: 1px solid var(--border-light);
 }
 .contact-form .btn span:first-child { font-weight: 600; }
+.contact-form .btn:disabled { opacity: 0.55; pointer-events: none; }
+
+/* honeypot — off-screen, never shown to real users */
+.field__hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* consent + submit status */
+.contact-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--white-40);
+  cursor: pointer;
+}
+.contact-consent input { margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+.contact-consent a { color: var(--accent-text); text-decoration: underline; }
+.contact-form__status {
+  font-size: 14px;
+  line-height: 1.35;
+  min-height: 1.35em; /* reserve space so the button doesn't jump when a message appears */
+}
+.contact-form__status.is-ok { color: var(--accent-text); }
+.contact-form__status.is-err { color: #ff6b6b; }
 
 /* Testimonial panel */
 .contact-aside { width: 337px; flex-shrink: 0; }

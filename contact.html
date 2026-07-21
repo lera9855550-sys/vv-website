@@ -40,7 +40,7 @@
         <p class="contact-intro__desc">Drop us a line anytime. We’ll listen to your story, ask a few questions, and explore how we can help your project thrive. No pressure, just a friendly chat.</p>
       </div>
 
-      <form class="contact-form" action="mailto:hello@email.com" method="post" enctype="text/plain">
+      <form class="contact-form" id="lead-form" novalidate>
         <div class="contact-form__fields">
           <div class="contact-form__row">
             <div class="field">
@@ -78,7 +78,13 @@
               <img class="field__chevron" src="assets/select-chevron.svg" alt="">
             </div>
           </div>
+          <input class="field__hp" type="text" name="company_website" tabindex="-1" autocomplete="off" aria-hidden="true">
         </div>
+        <label class="contact-consent">
+          <input type="checkbox" name="consent">
+          <span>I agree to the processing of my personal data. <a href="#">Privacy Policy</a></span>
+        </label>
+        <p class="contact-form__status" data-form-status role="status" aria-live="polite"></p>
         <button class="btn btn--white" type="submit">
           <span>Submit Message</span>
           <span class="btn__icon"><img src="assets/btn-arrow.svg" alt=""></span>
