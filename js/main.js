@@ -9,19 +9,83 @@ const setScrollbarWidth = () => {
 setScrollbarWidth();
 window.addEventListener("resize", setScrollbarWidth);
 
-// In-page anchor links: smooth-scroll to the section (the wheel-damping module sets
-// scroll-behavior:auto, which would otherwise make these jump instantly). Bare "#"
-// placeholder links do nothing instead of jerking the page to the top.
+// ── Smooth-scroll controller: ONE rAF loop shared by the wheel damping and the anchor/header
+// links. Previously each had its own loop with its own target, so a nav-link scroll and the wheel
+// scroller fought and the wheel target (stuck near 0) yanked the page back to the hero. ──
+const smoothScroll = (() => {
+  const root = document.documentElement;
+  const desktop = motionOK && finePointer && !("ontouchstart" in window);
+  if (motionOK) root.style.scrollBehavior = "auto"; // we drive scrolling; CSS smooth would double up
+  const EASE = 0.14; // wheel follow damping
+  const FACTOR = 0.9; // <1 = a touch less distance per wheel notch
+  const DUR = 600; // anchor glide duration (ms)
+  const maxScroll = () => root.scrollHeight - window.innerHeight;
+  const clampY = (y) => Math.max(0, Math.min(maxScroll(), y));
+  const setY = (y) => window.scrollTo({ top: y, behavior: "instant" }); // bypass CSS smooth
+
+  let target = window.scrollY, raf = null, mode = "idle";
+  let aFrom = 0, aTo = 0, aStart = 0;
+
+  const wheelRun = () => {
+    const cur = window.scrollY, diff = target - cur;
+    if (Math.abs(diff) < 0.5) { setY(target); raf = null; mode = "idle"; return; }
+    setY(cur + diff * EASE);
+    raf = requestAnimationFrame(wheelRun);
+  };
+  const anchorRun = (ts) => {
+    if (!aStart) aStart = ts;
+    const p = Math.min(1, (ts - aStart) / DUR);
+    setY(aFrom + (aTo - aFrom) * (1 - Math.pow(1 - p, 3))); // easeOutCubic
+    if (p < 1) raf = requestAnimationFrame(anchorRun);
+    else { raf = null; mode = "idle"; target = aTo; } // leave the shared target at the landing spot
+  };
+
+  if (desktop) {
+    window.addEventListener("wheel", (e) => {
+      if (e.ctrlKey || e.defaultPrevented) return; // let pinch-zoom through
+      if (e.target.closest("textarea, select, .mobile-menu")) return; // native scroll inside these
+      let dy = e.deltaY;
+      if (e.deltaMode === 1) dy *= 16; else if (e.deltaMode === 2) dy *= window.innerHeight;
+      e.preventDefault();
+      if (mode !== "wheel") { if (raf) cancelAnimationFrame(raf); raf = null; target = window.scrollY; } // take over from an anchor glide
+      mode = "wheel";
+      target = clampY(target + dy * FACTOR);
+      if (!raf) raf = requestAnimationFrame(wheelRun);
+    }, { passive: false });
+    // resync target when scrolled by any other means (scrollbar drag, etc.)
+    window.addEventListener("scroll", () => { if (!raf) target = window.scrollY; }, { passive: true });
+    // keyboard scrolling runs natively — stop the loop so it doesn't fight
+    window.addEventListener("keydown", (e) => {
+      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Spacebar"].includes(e.key)) {
+        if (raf) { cancelAnimationFrame(raf); raf = null; mode = "idle"; }
+      }
+    });
+  }
+
+  return {
+    to(y) {
+      y = clampY(y);
+      target = y; // keep the shared target in sync so the wheel loop never yanks back
+      if (!motionOK) { setY(y); return; }
+      if (raf) cancelAnimationFrame(raf);
+      mode = "anchor"; aFrom = window.scrollY; aTo = y; aStart = 0;
+      raf = requestAnimationFrame(anchorRun);
+    },
+  };
+})();
+
+// In-page anchor links (header nav, footer nav): smooth-scroll to the section via the shared
+// controller. Bare "#" placeholder links do nothing instead of jerking the page to the top.
 document.addEventListener("click", (e) => {
   const link = e.target.closest('a[href^="#"]');
   if (!link) return;
   const href = link.getAttribute("href");
-  if (href === "#") { e.preventDefault(); return; } // placeholder — don't jump to top
+  if (href === "#") { e.preventDefault(); return; }
   const target = document.querySelector(href);
   if (!target) return;
   e.preventDefault();
-  target.scrollIntoView({ behavior: motionOK ? "smooth" : "auto", block: "start" });
   history.replaceState(null, "", href);
+  smoothScroll.to(Math.round(target.getBoundingClientRect().top + window.scrollY));
 });
 
 // Sliders ([ 01 / 04 ] counter + prev/next arrows + progress rule)
@@ -391,53 +455,7 @@ if (motionOK && finePointer) {
   follow();
 }
 
-// Gentle smooth scrolling — a light damping of the wheel (desktop only), so the page
-// eases into place instead of snapping. Touch, keyboard and scrollbar stay native.
-if (motionOK && finePointer && !("ontouchstart" in window)) {
-  const root = document.documentElement;
-  root.style.scrollBehavior = "auto"; // our rAF loop drives the position; CSS smooth would fight it
-  const EASE = 0.14; // lower = slower/smoother glide
-  const FACTOR = 0.9; // <1 = a touch less distance per wheel notch
-  let target = window.scrollY;
-  let raf = null;
-
-  const maxScroll = () => root.scrollHeight - window.innerHeight;
-  const run = () => {
-    const cur = window.scrollY;
-    const diff = target - cur;
-    if (Math.abs(diff) < 0.5) {
-      window.scrollTo(0, target);
-      raf = null;
-      return;
-    }
-    window.scrollTo(0, cur + diff * EASE);
-    raf = requestAnimationFrame(run);
-  };
-
-  window.addEventListener(
-    "wheel",
-    (e) => {
-      if (e.ctrlKey || e.defaultPrevented) return; // let pinch-zoom through
-      if (e.target.closest("textarea, select, .mobile-menu")) return; // native scroll inside these
-      let dy = e.deltaY;
-      if (e.deltaMode === 1) dy *= 16; // lines → px
-      else if (e.deltaMode === 2) dy *= window.innerHeight; // pages → px
-      e.preventDefault();
-      target = Math.max(0, Math.min(maxScroll(), (raf ? target : window.scrollY) + dy * FACTOR));
-      if (!raf) raf = requestAnimationFrame(run);
-    },
-    { passive: false }
-  );
-
-  // resync when the page is scrolled by any other means (scrollbar drag, etc.)
-  window.addEventListener("scroll", () => { if (!raf) target = window.scrollY; }, { passive: true });
-  // let keyboard scrolling run natively
-  window.addEventListener("keydown", (e) => {
-    if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Spacebar"].includes(e.key)) {
-      if (raf) { cancelAnimationFrame(raf); raf = null; }
-    }
-  });
-}
+// (Wheel damping now lives in the shared smoothScroll controller near the top of this file.)
 
 // Page transition fade
 if (motionOK) {
