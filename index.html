@@ -7,7 +7,12 @@
   <meta name="description" content="We design change-making website and brand experiences that finally match the business behind them.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- load font CSS without blocking first paint -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap"></noscript>
+  <!-- LCP hero background — start fetching from the HTML, not after CSS parse -->
+  <link rel="preload" as="image" href="assets/bg.webp" fetchpriority="high">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -68,7 +73,7 @@
         <div class="side-panel__slides" data-slides>
           <div class="stat">
             <p class="stat__value">30+</p>
-            <p class="stat__label">details about the analitycs</p>
+            <p class="stat__label">details about the analytics</p>
           </div>
           <div class="stat" hidden>
             <p class="stat__value">12</p>
@@ -101,9 +106,8 @@
     <div class="work__grid">
       <a class="work-card" href="#">
         <span class="work-card__media">
-          <img src="assets/cover_website_1.png" alt="Meridian networking app" loading="lazy">
-          <img class="work-card__media-hover" src="assets/cover_website_1_hover.png" alt="" aria-hidden="true" loading="lazy">
-          <span class="work-card__preview" aria-hidden="true"></span>
+          <img src="assets/cover_website_1.webp" alt="Meridian networking app" loading="lazy">
+          <img class="work-card__media-hover" src="assets/cover_website_1_hover.webp" alt="" aria-hidden="true" loading="lazy">
         </span>
         <span class="work-card__caption">
           <span class="work-card__head">
@@ -116,23 +120,22 @@
       </a>
       <a class="work-card" href="#">
         <span class="work-card__media">
-          <img src="assets/cover_website_3.png" alt="NVIDIA × Ferrari RTX 5090 launch" loading="lazy">
-          <span class="work-card__preview" aria-hidden="true"></span>
+          <img src="assets/cover_website_3.webp" alt="Broxen shipping app" loading="lazy">
+          <img class="work-card__media-hover" src="assets/cover_website_3_hover.webp" alt="" aria-hidden="true" loading="lazy">
         </span>
         <span class="work-card__caption">
           <span class="work-card__head">
-            <span class="work-card__name">NVIDIA × Ferrari</span>
+            <span class="work-card__name">Broxen</span>
             <span class="work-card__dot" aria-hidden="true"></span>
-            <span class="work-card__desc">RTX 5090 limited-edition launch</span>
+            <span class="work-card__desc">Cargo shipping &amp; tracking platform</span>
           </span>
-          <span class="work-card__tags">Web, Art Direction</span>
+          <span class="work-card__tags">Product, Web</span>
         </span>
       </a>
       <a class="work-card" href="#">
         <span class="work-card__media">
-          <img src="assets/cover_website_2.png" alt="CleanSkin natural skincare" loading="lazy">
-          <img class="work-card__media-hover" src="assets/cover_website_2_hover.png" alt="" aria-hidden="true" loading="lazy">
-          <span class="work-card__preview" aria-hidden="true"></span>
+          <img src="assets/cover_website_2.webp" alt="CleanSkin natural skincare" loading="lazy">
+          <img class="work-card__media-hover" src="assets/cover_website_2_hover.webp" alt="" aria-hidden="true" loading="lazy">
         </span>
         <span class="work-card__caption">
           <span class="work-card__head">
@@ -145,9 +148,8 @@
       </a>
       <a class="work-card" href="#">
         <span class="work-card__media">
-          <img src="assets/cover_website_4.png" alt="Timepiece watch boutique" loading="lazy">
-          <img class="work-card__media-hover" src="assets/cover_website_4_hover.png" alt="" aria-hidden="true" loading="lazy">
-          <span class="work-card__preview" aria-hidden="true"></span>
+          <img src="assets/cover_website_4.webp" alt="Timepiece watch boutique" loading="lazy">
+          <img class="work-card__media-hover" src="assets/cover_website_4_hover.webp" alt="" aria-hidden="true" loading="lazy">
         </span>
         <span class="work-card__caption">
           <span class="work-card__head">
@@ -176,7 +178,7 @@
         </div>
         <div class="side-panel__rule"></div>
         <div class="testimonial">
-          <p class="testimonial__label">[ what other say ]</p>
+          <p class="testimonial__label">[ what others say ]</p>
           <div data-slides>
             <div class="testimonial-slide">
               <blockquote class="testimonial__quote">“Huy and his team at MONOLOG are rare collaborators. They care about your vision as if it were their own and helped us win bigger opportunities. Talented, humble, and relentless in finding elegant solutions, they’re the partner ambitious, mission-driven brands need.”</blockquote>
@@ -221,10 +223,10 @@
       </div>
     </div>
     <div class="services__media">
-      <img src="assets/project-img.jpg" alt="" loading="lazy">
-      <img src="assets/step3-card.png" alt="" loading="lazy">
-      <img src="assets/step2-card.png" alt="" loading="lazy">
-      <img src="assets/step4-card.png" alt="" loading="lazy">
+      <img src="assets/project-img.webp" alt="" loading="lazy">
+      <img src="assets/step3-card.webp" alt="" loading="lazy">
+      <img src="assets/step2-card.webp" alt="" loading="lazy">
+      <img src="assets/step4-card.webp" alt="" loading="lazy">
     </div>
     </div>
   </section>
@@ -244,7 +246,7 @@
           <p class="process-step__desc">We get into your business — your product, your market, your ambition. No templates, no assumptions. We leave with a clear picture of what needs to change and why.</p>
         </div>
         <div class="process-step__media">
-          <video src="assets/step1.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <video data-src="assets/step1.mp4" poster="assets/step1-poster.webp" muted loop playsinline preload="none"></video>
           <span class="process-step__tint" aria-hidden="true"></span>
           <span class="process-step__pattern" aria-hidden="true"></span>
         </div>
@@ -259,7 +261,7 @@
           <p class="process-step__desc">We define the visual language before touching a single screen. Typography, color, motion logic, spatial hierarchy. Everything gets locked before execution begins.</p>
         </div>
         <div class="process-step__media">
-          <video src="assets/step2.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <video data-src="assets/step2.mp4" poster="assets/step2-poster.webp" muted loop playsinline preload="none"></video>
           <span class="process-step__tint" aria-hidden="true"></span>
           <span class="process-step__pattern" aria-hidden="true"></span>
         </div>
@@ -274,7 +276,7 @@
           <p class="process-step__desc">Web, UI/UX, motion, 3D — built as a system, not a collection of screens. Every frame is designed to perform, not just to impress.</p>
         </div>
         <div class="process-step__media">
-          <video src="assets/step3.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <video data-src="assets/step3.mp4" poster="assets/step3-poster.webp" muted loop playsinline preload="none"></video>
           <span class="process-step__tint" aria-hidden="true"></span>
           <span class="process-step__pattern" aria-hidden="true"></span>
         </div>
@@ -289,7 +291,7 @@
           <p class="process-step__desc">You get the assets, the files, and the handoff documentation. No loose ends. No "figure it out yourself."</p>
         </div>
         <div class="process-step__media">
-          <video src="assets/step4.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <video data-src="assets/step4.mp4" poster="assets/step4-poster.webp" muted loop playsinline preload="none"></video>
           <span class="process-step__tint" aria-hidden="true"></span>
           <span class="process-step__pattern" aria-hidden="true"></span>
         </div>
@@ -301,7 +303,7 @@
   <section class="pricing section-light" id="pricing">
     <div class="pricing__intro">
       <h2 class="section-title">Take what suits your needs</h2>
-      <a class="pricing__connect" href="mailto:hello@email.com">
+      <a class="pricing__connect" href="contact.html">
         <span>Let’s connect</span>
         <img src="assets/connect-arrow.svg" alt="">
       </a>
@@ -324,7 +326,7 @@
               <li>Increase the value of your brand</li>
             </ul>
           </div>
-          <a class="btn btn--white" href="mailto:hello@email.com">
+          <a class="btn btn--white" href="contact.html">
             <span>Start project</span>
             <span class="btn__icon"><img src="assets/btn-arrow.svg" alt=""></span>
           </a>
@@ -345,7 +347,7 @@
               <li>Increase the value of your brand</li>
             </ul>
           </div>
-          <a class="btn btn--white" href="mailto:hello@email.com">
+          <a class="btn btn--white" href="contact.html">
             <span>Start project</span>
             <span class="btn__icon"><img src="assets/btn-arrow.svg" alt=""></span>
           </a>
@@ -356,7 +358,7 @@
             <p class="price-card__kicker">custom</p>
             <p class="price-card__price">$35/h</p>
           </div>
-          <a class="btn btn--white" href="mailto:hello@email.com">
+          <a class="btn btn--white" href="contact.html">
             <span>Start project</span>
             <span class="btn__icon"><img src="assets/btn-arrow.svg" alt=""></span>
           </a>
@@ -431,7 +433,7 @@
   <!-- ============ CTA ============ -->
   <section class="cta">
     <h2 class="cta__title">Great work stays invisible until the right design makes it impossible to ignore</h2>
-    <a class="btn btn--white btn--bordered" href="mailto:hello@email.com">
+    <a class="btn btn--white btn--bordered" href="contact.html">
       <span class="cta__btn-label">Start the conversation</span>
       <span class="btn__icon"><img src="assets/btn-arrow.svg" alt=""></span>
     </a>
@@ -462,7 +464,7 @@
             </ul>
           </div>
           <div class="footer__links-col">
-            <p class="footer__kicker">Legacy</p>
+            <p class="footer__kicker">Legal</p>
             <ul class="footer__links">
               <li><a href="#">Privacy Policy<img src="assets/social-arrow.svg" alt=""></a></li>
               <li><a href="#">Terms of Use<img src="assets/social-arrow.svg" alt=""></a></li>
@@ -470,7 +472,7 @@
           </div>
         </div>
         <div class="footer__contact">
-          <p class="footer__kicker">Conact us</p>
+          <p class="footer__kicker">Contact us</p>
           <p class="footer__email"><a href="mailto:hello@email.com">hello@email.com</a></p>
           <p class="footer__location">Based in Ukraine, working World Wide</p>
         </div>
@@ -483,7 +485,7 @@
           <p><span data-kyiv-time>Kyiv City 05:35:01 PM</span></p>
           <p><span data-kyiv-date>Friday, Jun 19, 2026 (GMT +02)</span></p>
         </div>
-        <p class="footer__copyright">© 2026 V+V Gallery. All rights served.</p>
+        <p class="footer__copyright">© 2026 V+V Gallery. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -523,6 +525,6 @@
     </div>
   </div>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js" defer></script>
 </body>
 </html>

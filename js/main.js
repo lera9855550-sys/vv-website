@@ -72,6 +72,13 @@ if (servicesWrap && serviceItems.length) {
   serviceItems.forEach((li, i) => li.addEventListener("mouseenter", () => showService(i)));
   const servicesList = document.querySelector(".services__list");
   if (servicesList) servicesList.addEventListener("mouseleave", clearService);
+
+  // Touch has no hover: without an active item the names sit unreadable under the
+  // difference-blended image. Activate the first service by default and let taps switch.
+  if (window.matchMedia("(hover: none)").matches) {
+    showService(0);
+    serviceItems.forEach((li, i) => li.addEventListener("click", () => showService(i)));
+  }
 }
 
 // Mobile menu (full-screen overlay, Figma "Menu Mob")
@@ -445,7 +452,8 @@ if (motionOK) {
 
   document.addEventListener("click", (e) => {
     const link = e.target.closest('a[href$=".html"], a[href*=".html#"]');
-    if (!link || link.target === "_blank" || e.metaKey || e.ctrlKey) return;
+    // let the browser handle new-window/new-tab/download intents natively
+    if (!link || link.target === "_blank" || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
     fade.classList.remove("is-out");
     setTimeout(() => (window.location.href = link.href), 380);
@@ -499,4 +507,27 @@ if (leadForm) {
       if (btnLabel && original) btnLabel.textContent = original;
     }
   });
+}
+
+// Process videos: ship without src/autoplay (poster only). Fetch + play a clip only while it's
+// near/in the viewport, pause it when it leaves — so the ~1MB of loops never loads on first paint
+// and never burns CPU/battery offscreen. Reduced-motion users just keep the static posters.
+const lazyVideos = document.querySelectorAll("video[data-src]");
+if (motionOK && lazyVideos.length && "IntersectionObserver" in window) {
+  const videoIO = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((en) => {
+        const v = en.target;
+        if (en.isIntersecting) {
+          if (!v.src) v.src = v.dataset.src; // fetch only now
+          const p = v.play();
+          if (p && p.catch) p.catch(() => {}); // ignore autoplay-policy rejections
+        } else if (!v.paused) {
+          v.pause();
+        }
+      });
+    },
+    { rootMargin: "200px 0px" } // warm up just before it scrolls into view
+  );
+  lazyVideos.forEach((v) => videoIO.observe(v));
 }

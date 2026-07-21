@@ -98,7 +98,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 .btn--dark { background: var(--bg-panel); color: #fff; }
 .btn--white { background: #fff; color: #000; }
 .btn--bordered:hover { border-color: var(--accent); }
-.btn--bordered { border: 1px solid var(--border-light); width: 334px; }
+.btn--bordered { border: 1px solid var(--border-light); width: 334px; max-width: 100%; }
 .btn__icon { width: 52px; height: 52px; flex-shrink: 0; }
 .btn__icon img { width: 100%; height: 100%; transition: transform 0.15s ease; }
 
@@ -136,7 +136,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   height: 100vh;
   height: 100dvh; /* exactly one screen; dvh tracks the visible viewport (mobile browser chrome) */
   min-height: 600px; /* floor so content never crushes into the header on very short windows */
-  background: var(--bg-hero) url("../assets/hero-bg.jpg") center / cover no-repeat;
+  background: var(--bg-hero) url("../assets/bg.webp") center / cover no-repeat;
   overflow: hidden;
 }
 .hero__title {
@@ -328,7 +328,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   gap: 24px 4px;
   padding: 0 var(--pad-x);
 }
-.work-card { display: flex; flex-direction: column; gap: 16px; }
+.work-card { display: flex; flex-direction: column; gap: 16px; min-width: 0; /* let the 1fr grid track shrink so the nowrap desc can't force page-wide overflow */ }
 .work-card__media {
   position: relative;
   height: 596px;
@@ -377,24 +377,6 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   transition: opacity 0.5s ease;
   pointer-events: none;
 }
-/* white preview panel — hidden by default; only shown on real hover (desktop) */
-.work-card__preview {
-  position: absolute;
-  z-index: 2;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(0.96);
-  width: 88%;
-  max-width: 600px;
-  aspect-ratio: 600 / 350;
-  max-height: 70%;
-  background: #fff;
-  border-radius: 8px;
-  opacity: 0;
-  transition: opacity 0.45s ease, transform 0.45s ease;
-  pointer-events: none;
-}
-
 .work-card__caption {
   display: flex;
   flex-direction: column;
@@ -447,8 +429,10 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 @media (hover: hover) {
   .work-card__dot,
   .work-card__desc { display: block; }
-  .work-card:hover .work-card__media img:not(.work-card__media-hover) { transform: scale(1.08); filter: blur(8px); }
-  .work-card:hover .work-card__media::after { opacity: 1; }
+  /* only blur/darken when there's a hover cover to reveal — cards without one (e.g. NVIDIA
+     until its hover asset lands) keep a clean static image instead of an empty dark panel */
+  .work-card:has(.work-card__media-hover):hover .work-card__media img:not(.work-card__media-hover) { transform: scale(1.08); filter: blur(8px); }
+  .work-card:has(.work-card__media-hover):hover .work-card__media::after { opacity: 1; }
   .work-card:hover .work-card__media img.work-card__media-hover { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   .work-card:hover .work-card__name { background: var(--accent); }
   .work-card:hover .work-card__dot,
@@ -847,7 +831,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   flex-direction: column;
   align-items: center;
   gap: 48px;
-  background: #000 url("../assets/cta-bg.png") center / cover no-repeat;
+  background: #000 url("../assets/cta-bg.webp") center / cover no-repeat;
   overflow: hidden;
 }
 .cta::after {
@@ -969,7 +953,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 
 .footer__band {
   height: 280px;
-  background: var(--bg-hero) url("../assets/hero-bg.jpg") center 65% / cover no-repeat;
+  background: var(--bg-hero) url("../assets/bg.webp") center 65% / cover no-repeat;
   display: flex;
   align-items: flex-end;
 }
@@ -1008,7 +992,7 @@ body.menu-open { overflow: hidden; }
   content: "";
   position: fixed;
   inset: 0;
-  background: var(--bg-hero) url("../assets/hero-bg.jpg") center / cover no-repeat;
+  background: var(--bg-hero) url("../assets/bg.webp") center / cover no-repeat;
   transform: scaleY(-1);
   opacity: 0.56;
   pointer-events: none;
@@ -1166,7 +1150,7 @@ body.menu-open { overflow: hidden; }
     transform: translateY(-50%);
     height: 288px;
     border-radius: 8px;
-    background: var(--svc-img, url("../assets/project-img.jpg")) center / cover no-repeat;
+    background: var(--svc-img, url("../assets/project-img.webp")) center / cover no-repeat;
     mix-blend-mode: difference;
     pointer-events: none;
   }
@@ -1376,8 +1360,8 @@ body.menu-open { overflow: hidden; }
   .work-card__dot,
   .work-card__desc { display: block; }
 
-  .work-card.is-hovered .work-card__media img:not(.work-card__media-hover) { transform: scale(1.08); filter: blur(8px); }
-  .work-card.is-hovered .work-card__media::after { opacity: 1; }
+  .work-card:has(.work-card__media-hover).is-hovered .work-card__media img:not(.work-card__media-hover) { transform: scale(1.08); filter: blur(8px); }
+  .work-card:has(.work-card__media-hover).is-hovered .work-card__media::after { opacity: 1; }
   .work-card.is-hovered .work-card__media img.work-card__media-hover { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   .work-card.is-hovered .work-card__name { background: var(--accent); }
   .work-card.is-hovered .work-card__dot,

@@ -7,7 +7,10 @@
   <meta name="description" content="Drop us a line anytime. We’ll listen to your story, ask a few questions, and explore how we can help your project thrive.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- load font CSS without blocking first paint -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap"></noscript>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/contact.css">
 </head>
@@ -159,7 +162,7 @@
             </ul>
           </div>
           <div class="footer__links-col">
-            <p class="footer__kicker">Legacy</p>
+            <p class="footer__kicker">Legal</p>
             <ul class="footer__links">
               <li><a href="#">Privacy Policy<img src="assets/social-arrow.svg" alt=""></a></li>
               <li><a href="#">Terms of Use<img src="assets/social-arrow.svg" alt=""></a></li>
@@ -167,7 +170,7 @@
           </div>
         </div>
         <div class="footer__contact">
-          <p class="footer__kicker">Conact us</p>
+          <p class="footer__kicker">Contact us</p>
           <p class="footer__email"><a href="mailto:hello@email.com">hello@email.com</a></p>
           <p class="footer__location">Based in Ukraine, working World Wide</p>
         </div>
@@ -180,7 +183,7 @@
           <p><span data-kyiv-time>Kyiv City 05:35:01 PM</span></p>
           <p><span data-kyiv-date>Friday, Jun 19, 2026 (GMT +02)</span></p>
         </div>
-        <p class="footer__copyright">© 2026 V+V Gallery. All rights served.</p>
+        <p class="footer__copyright">© 2026 V+V Gallery. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -220,6 +223,6 @@
     </div>
   </div>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js" defer></script>
 </body>
 </html>

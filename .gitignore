@@ -1,2 +1,5 @@
 .DS_Store
 .claude/
+
+# local backup of pre-WebP originals (not served)
+assets/original/
