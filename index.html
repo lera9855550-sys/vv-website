@@ -14,6 +14,33 @@
   <!-- LCP hero background — start fetching from the HTML, not after CSS parse -->
   <link rel="preload" as="image" href="assets/bg.webp" fetchpriority="high">
   <link rel="stylesheet" href="css/styles.css">
+  <!-- Large-screen scaling. Up to START the design renders 1:1 exactly as drawn (laptops and
+       1080p monitors — no zoom at all). Only genuinely large displays (1440p, ultrawide, 4K) get
+       the whole layout zoomed so it fills the screen instead of sitting small with huge gutters.
+       Zoom is continuous at the threshold (z = 1 at START) so there's no jump.
+       Inline in <head> so the first paint is already scaled (no flash). -->
+  <script>
+    (function () {
+      var START = 1920, CONTENT = 1360, MINPAD = 40, MAXZOOM = 2, root = document.documentElement;
+      function scale() {
+        var w = window.innerWidth;
+        if (w <= START) { // 1:1 — laptops/1080p keep the exact design proportions
+          root.style.zoom = "";
+          root.style.removeProperty("--pad-x");
+          root.style.removeProperty("--vh");
+          return;
+        }
+        var z = Math.min(MAXZOOM, w / START), canvas = w / z, pad = Math.max(MINPAD, (canvas - CONTENT) / 2);
+        root.style.zoom = z;
+        root.style.setProperty("--pad-x", pad + "px");
+        // vh units resolve against the unzoomed viewport and then get scaled, so a 100dvh hero
+        // would overflow by exactly the zoom factor — feed it the corrected height instead.
+        root.style.setProperty("--vh", window.innerHeight / z + "px");
+      }
+      scale();
+      window.addEventListener("resize", scale, { passive: true });
+    })();
+  </script>
 </head>
 <body>
 
@@ -247,7 +274,6 @@
         </div>
         <div class="process-step__media">
           <video data-src="assets/step1.mp4" poster="assets/step1-poster.webp" muted loop playsinline preload="none"></video>
-          <span class="process-step__tint" aria-hidden="true"></span>
           <span class="process-step__pattern" aria-hidden="true"></span>
         </div>
       </article>
@@ -262,7 +288,6 @@
         </div>
         <div class="process-step__media">
           <video data-src="assets/step2.mp4" poster="assets/step2-poster.webp" muted loop playsinline preload="none"></video>
-          <span class="process-step__tint" aria-hidden="true"></span>
           <span class="process-step__pattern" aria-hidden="true"></span>
         </div>
       </article>
@@ -277,7 +302,6 @@
         </div>
         <div class="process-step__media">
           <video data-src="assets/step3.mp4" poster="assets/step3-poster.webp" muted loop playsinline preload="none"></video>
-          <span class="process-step__tint" aria-hidden="true"></span>
           <span class="process-step__pattern" aria-hidden="true"></span>
         </div>
       </article>
@@ -292,7 +316,6 @@
         </div>
         <div class="process-step__media">
           <video data-src="assets/step4.mp4" poster="assets/step4-poster.webp" muted loop playsinline preload="none"></video>
-          <span class="process-step__tint" aria-hidden="true"></span>
           <span class="process-step__pattern" aria-hidden="true"></span>
         </div>
       </article>

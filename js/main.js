@@ -85,8 +85,59 @@ document.addEventListener("click", (e) => {
   if (!target) return;
   e.preventDefault();
   history.replaceState(null, "", href);
-  smoothScroll.to(Math.round(target.getBoundingClientRect().top + window.scrollY));
+  const go = () => smoothScroll.to(Math.round(target.getBoundingClientRect().top + window.scrollY));
+  // Tapped inside the mobile menu: it closes on click (0.3s fade), so wait for it — otherwise the
+  // page scrolls behind an opaque full-screen overlay and the motion is invisible.
+  if (link.closest(".mobile-menu")) setTimeout(go, 320);
+  else go();
 });
+
+// Header: hides while scrolling down, comes back on the first upward scroll. Near the very top
+// it returns to its original transparent state; below that it gets the .is-stuck backdrop so the
+// white logo/nav stay readable over the light sections.
+(() => {
+  const header = document.querySelector(".header");
+  if (!header) return;
+
+  // the intro animation is fill:forwards and would outrank the hide transform — retire it once played
+  const ready = () => header.classList.add("is-ready");
+  header.addEventListener("animationend", ready, { once: true });
+  setTimeout(ready, 1200); // fallback (reduced-motion never fires animationend)
+
+  const TOP_ZONE = 90; // above this we're "at the top": always shown
+  const DELTA = 6; // ignore sub-pixel jitter / rubber-banding
+  const PROBE = 40; // point (px from top) where we sample which section sits under the bar
+  const lightSections = [...document.querySelectorAll(".section-light")];
+  let lastY = window.scrollY;
+  let queued = false;
+
+  const update = () => {
+    queued = false;
+    const y = Math.max(0, window.scrollY);
+    const diff = y - lastY;
+
+    // invert colours when a light section is behind the bar (black on light, white on dark)
+    const onLight = lightSections.some((s) => {
+      const r = s.getBoundingClientRect();
+      return r.top <= PROBE && r.bottom >= PROBE;
+    });
+    header.classList.toggle("header--on-light", onLight);
+
+    if (document.body.classList.contains("menu-open")) { // mobile menu open — keep it put
+      header.classList.remove("is-hidden");
+      lastY = y;
+      return;
+    }
+    if (y <= TOP_ZONE) header.classList.remove("is-hidden");
+    else if (Math.abs(diff) > DELTA) header.classList.toggle("is-hidden", diff > 0);
+    lastY = y;
+  };
+
+  window.addEventListener("scroll", () => {
+    if (!queued) { queued = true; requestAnimationFrame(update); }
+  }, { passive: true });
+  update();
+})();
 
 // Sliders ([ 01 / 04 ] counter + prev/next arrows + progress rule)
 document.querySelectorAll(".side-panel").forEach((panel) => {

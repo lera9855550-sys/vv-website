@@ -104,7 +104,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 
 /* ============ Header ============ */
 .header {
-  position: absolute;
+  position: fixed; /* stays available: hides on scroll down, returns on scroll up */
   top: 22px;
   left: 0;
   right: 0;
@@ -114,8 +114,26 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   justify-content: space-between;
   gap: 24px;
   padding: 0 var(--pad-x);
-  z-index: 10;
+  z-index: 50; /* over page content, under the mobile menu overlay (100) */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+/* scrolling down — tuck it away; scrolling up brings it back */
+.header.is-hidden { transform: translateY(-130%); }
+/* the intro rise-in animation is fill:forwards, which would outrank the transform above;
+   JS drops the animation once it has played so the hide/show transform can take over */
+.header.is-ready { animation: none; opacity: 1; }
+
+/* No backdrop — instead the bar inverts over light sections (JS toggles .header--on-light):
+   white logo/nav/button on dark, black on the light #work / #pricing sections. */
+.menu a,
+.menu-toggle span,
+.logo img,
+.header__cta { transition: color 0.3s ease, background-color 0.3s ease, filter 0.3s ease; }
+.header--on-light .menu a { color: #000; }
+.header--on-light .logo img { filter: invert(1) brightness(0.85); } /* white wordmark → near-black */
+.header--on-light .menu-toggle span { background: #000; }
+/* the CTA stays its usual grey (--bg-panel) on light sections too — it reads fine and matches
+   every other button on the site */
 .logo { width: 93px; height: 32px; flex-shrink: 0; }
 .logo img { width: 100%; height: 100%; }
 .menu {
@@ -135,6 +153,8 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   position: relative;
   height: 100vh;
   height: 100dvh; /* exactly one screen; dvh tracks the visible viewport (mobile browser chrome) */
+  /* --vh is set by the large-screen scaler: under zoom, 100dvh would overflow by the zoom factor */
+  height: var(--vh, 100dvh);
   min-height: 600px; /* floor so content never crushes into the header on very short windows */
   background: var(--bg-hero) url("../assets/bg.webp") center / cover no-repeat;
   overflow: hidden;
@@ -610,6 +630,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
+  isolation: isolate; /* contain the halftone blend so it can't mix with the page behind */
 }
 .process-step__media img {
   display: block;
@@ -629,15 +650,11 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 .process-step:nth-child(2) .process-step__media video { width: 144.16%; left: -1.18%; top: -1.43%; transform: scaleX(-1); }
 .process-step:nth-child(3) .process-step__media video { width: 117.16%; left: -16.77%; top: -27.71%; }
 .process-step:nth-child(4) .process-step__media video { width: 143.39%; left: 0; top: -37.14%; }
-/* green duotone overlay under the pattern (Figma "overlay color", color-burn) */
-.process-step__tint {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  /* Figma "overlay color": green gradient, color-burn */
-  background: linear-gradient(-34deg, rgba(20, 33, 24, 0.48) 10%, rgba(117, 143, 72, 0.48) 74%);
-  mix-blend-mode: color-burn;
-}
+/* The green duotone grade (Figma "overlay color") is now BAKED INTO the video files.
+   It used to be a color-burn overlay here, but color-burn divides by the source colour, so in
+   dark frame areas tiny per-channel differences exploded into coloured blotches — invisible on
+   sRGB desktop, glaring on iPhone (Display-P3 blending over a hardware video layer).
+   Baked with the identical maths (ffmpeg burn @ 0.48 in RGB), so the look is unchanged. */
 /* signature halftone pattern kept on top of the video (Figma FW_Cross overlay) */
 .process-step__pattern {
   position: absolute;
@@ -1087,7 +1104,7 @@ body.menu-open { overflow: hidden; }
     display: block;
     width: 22px;
     height: 2px;
-    background: #000;
+    background: #fff; /* white over dark sections; .header--on-light flips it to black */
   }
 
   /* Hero */
@@ -1140,20 +1157,11 @@ body.menu-open { overflow: hidden; }
     gap: 16px;
     white-space: nowrap;
   }
-  .services__media { display: none; } /* desktop overlay; mobile draws the image on ::after */
-  .services__list::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 288px;
-    border-radius: 8px;
-    background: var(--svc-img, url("../assets/project-img.webp")) center / cover no-repeat;
-    mix-blend-mode: difference;
-    pointer-events: none;
-  }
+  /* Mobile: no photo behind the service list for now — just the names. Without the
+     difference-blended image the #2e2e2e text would be invisible on the dark background,
+     so inactive items get a readable muted white (the active one stays solid #fff). */
+  .services__media { display: none; }
+  .services__list { color: var(--white-40); }
 
   /* Process */
   .process { padding: 80px var(--pad-x) 120px; gap: 40px; }
