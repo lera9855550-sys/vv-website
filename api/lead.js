@@ -4,8 +4,9 @@
 //   https://<your-project>.vercel.app/api/lead
 //
 // Set these in Vercel → Settings → Environment Variables (NOT in the site code):
-//   TG_TOKEN  — bot token from @BotFather
-//   TG_CHAT   — chat id to send leads to
+//   TG_TOKEN    — bot token from @BotFather
+//   TG_CHAT     — chat id to send leads to
+//   SHEETS_URL  — (optional) Google Apps Script web-app URL that appends a row to a spreadsheet
 
 const ALLOWED_ORIGIN = "https://lera9855550-sys.github.io"; // only this site may call it
 const MAX_BODY = 20 * 1024; // reject payloads larger than 20KB
@@ -64,13 +65,27 @@ export default async function handler(req, res) {
   const email = clean(d.email, LIMITS.email);
   if (!EMAIL_RE.test(email)) return res.status(422).json({ ok: false, error: "email" });
 
+  const lead = {
+    first_name: clean(d.first_name, LIMITS.first_name),
+    last_name: clean(d.last_name, LIMITS.last_name),
+    company: clean(d.company, LIMITS.company),
+    email,
+    budget: clean(d.budget, LIMITS.budget),
+    description: clean(d.description, LIMITS.description),
+  };
+
   const text =
     "🟢 Новая заявка — V+V Gallery\n" +
-    `Имя: ${clean(d.first_name, LIMITS.first_name)} ${clean(d.last_name, LIMITS.last_name)}\n` +
-    `Компания: ${clean(d.company, LIMITS.company) || "—"}\n` +
-    `Email: ${email}\n` +
-    `Бюджет: ${clean(d.budget, LIMITS.budget) || "—"}\n` +
-    `Задача: ${clean(d.description, LIMITS.description) || "—"}`;
+    `Имя: ${lead.first_name} ${lead.last_name}\n` +
+    `Компания: ${lead.company || "—"}\n` +
+    `Email: ${lead.email}\n` +
+    `Бюджет: ${lead.budget || "—"}\n` +
+    `Задача: ${lead.description || "—"}`;
+
+  // Deliver to both Telegram (instant notification) and Google Sheets (durable record). The lead
+  // counts as delivered if EITHER succeeds — a sheet outage must not lose a Telegram lead, and
+  // vice-versa. Only a total failure (both down) returns 502 so the visitor can retry.
+  let delivered = false;
 
   try {
     const tg = await fetch(`https://api.telegram.org/bot${process.env.TG_TOKEN}/sendMessage`, {
@@ -79,9 +94,19 @@ export default async function handler(req, res) {
       // slice(0, 4096) guards Telegram's hard message-length limit so a valid lead is never dropped
       body: JSON.stringify({ chat_id: process.env.TG_CHAT, text: text.slice(0, 4096), disable_web_page_preview: true }),
     });
-    if (!tg.ok) throw new Error("telegram " + tg.status);
-    return res.status(200).json({ ok: true });
-  } catch (err) {
-    return res.status(502).json({ ok: false, error: "send" });
+    if (tg.ok) delivered = true;
+  } catch {}
+
+  if (process.env.SHEETS_URL) {
+    try {
+      const sh = await fetch(process.env.SHEETS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(lead),
+      });
+      if (sh.ok) delivered = true;
+    } catch {}
   }
+
+  return res.status(delivered ? 200 : 502).json({ ok: delivered });
 }
