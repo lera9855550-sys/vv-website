@@ -205,6 +205,7 @@ const setMenu = (open) => {
   document.body.classList.toggle("menu-open", open);
   toggle?.setAttribute("aria-expanded", String(open));
   mobileMenu?.setAttribute("aria-hidden", String(!open));
+  if (open) startMenuScene(); // spin up the animated background the first time the menu opens
 };
 
 toggle?.addEventListener("click", () => setMenu(!mobileMenu?.classList.contains("is-open")));
@@ -638,6 +639,40 @@ if (sceneTargets.length && motionOK) {
     s.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8/dist/unicornStudio.umd.js";
     s.async = true;
     s.onload = startScenes;
+    document.head.appendChild(s);
+  }
+}
+
+// The mobile menu shares the hero's animated background, but it's only initialised the first time
+// the menu opens — no point running a third WebGL scene while the menu is closed. Reuses the SDK if
+// the hero already loaded it, otherwise loads it on demand. Skipped under reduced-motion.
+let menuSceneStarted = false;
+function startMenuScene() {
+  if (menuSceneStarted || !motionOK) return;
+  const el = document.getElementById("menu-bg");
+  if (!el) return;
+  const add = () => {
+    if (!window.UnicornStudio || !window.UnicornStudio.addScene) return;
+    menuSceneStarted = true;
+    window.UnicornStudio.addScene({
+      elementId: "menu-bg",
+      filePath: "assets/hero-scene.json",
+      scale: finePointer ? 1 : 0.6,
+      dpi: 1.5,
+      fps: 60,
+      lazyLoad: false,
+      production: true,
+    })
+      .then(() => el.classList.add("is-ready"))
+      .catch(() => {});
+  };
+  if (window.UnicornStudio && window.UnicornStudio.addScene) {
+    add();
+  } else {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8/dist/unicornStudio.umd.js";
+    s.async = true;
+    s.onload = add;
     document.head.appendChild(s);
   }
 }

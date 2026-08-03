@@ -1064,23 +1064,35 @@ body.menu-open { overflow: hidden; }
   flex-direction: column;
   justify-content: space-between;
   padding: 24px 16px 36px;
-  background: #000;
+  background: #0e100c; /* dark base, same as the hero — the animated scene fades in over it */
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s;
   overflow-y: auto;
 }
 .mobile-menu.is-open { opacity: 1; visibility: visible; }
+/* Animated Unicorn Studio scene — same one as the hero. Initialised on first open (see main.js)
+   and fades in once ready. pointer-events:none so taps pass through to the menu content above. */
+.mobile-menu__bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.mobile-menu__bg.is-ready { opacity: 1; }
+.mobile-menu__bg canvas { display: block; width: 100% !important; height: 100% !important; }
+/* readability scrim over the animation, under the content */
 .mobile-menu::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: var(--bg-hero) url("../assets/bg.webp") center / cover no-repeat;
-  transform: scaleY(-1);
-  opacity: 0.56;
+  z-index: 1;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.55));
   pointer-events: none;
 }
-.mobile-menu > * { position: relative; z-index: 1; }
+.mobile-menu > *:not(.mobile-menu__bg) { position: relative; z-index: 2; }
 
 .mobile-menu__main { display: flex; flex-direction: column; gap: 80px; }
 .mobile-menu__header {
