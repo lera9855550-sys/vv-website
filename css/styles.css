@@ -123,6 +123,24 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
    JS drops the animation once it has played so the hide/show transform can take over */
 .header.is-ready { animation: none; opacity: 1; }
 
+/* Soft top scrim behind the bar so the white nav/logo stay legible over the bright animated
+   scene — a gradient that fades to nothing (not a solid pill). Hidden over light sections where
+   the bar already inverts to black. It's a header child so it hides together with the bar. */
+.header::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 130px;
+  z-index: -1; /* behind the nav/logo, above page content */
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15) 55%, transparent);
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.header--on-light::before { opacity: 0; } /* no dark scrim over light sections */
+
 /* No backdrop — instead the bar inverts over light sections (JS toggles .header--on-light):
    white logo/nav/button on dark, black on the light #work / #pricing sections. */
 .menu a,
@@ -156,9 +174,37 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   /* --vh is set by the large-screen scaler: under zoom, 100dvh would overflow by the zoom factor */
   height: var(--vh, 100dvh);
   min-height: 600px; /* floor so content never crushes into the header on very short windows */
-  background: var(--bg-hero) url("../assets/bg.webp") center / cover no-repeat;
+  /* Dark base (matches the scene's near-black tone) instead of the old bg.webp still — the animated
+     scene fades in over this, so there's no jarring swap from an unrelated static image. */
+  background: #0e100c;
   overflow: hidden;
 }
+/* Reduced-motion / no-WebGL users don't get the animated scene, so give them the static texture. */
+@media (prefers-reduced-motion: reduce) {
+  .hero { background: var(--bg-hero) url("../assets/bg.webp") center / cover no-repeat; }
+}
+/* Animated Unicorn Studio scene, layered over the static bg.webp poster. Fades in once ready;
+   pointer-events:none so header/hero clicks + page scroll pass straight through to the page. */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.hero__bg.is-ready { opacity: 1; }
+.hero .grid-lines { display: none; } /* no guide hairlines over the animated hero — kept on other sections */
+/* readability scrim: darkens the lower half (where the title/subtitle sit) so white text stays
+   legible no matter how bright the animated scene gets. Above the scene, below the content. */
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.22) 40%, transparent 66%);
+}
+.hero__bg canvas { display: block; width: 100% !important; height: 100% !important; }
 .hero__title {
   position: absolute;
   left: var(--pad-x);
@@ -970,9 +1016,29 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 
 .footer__band {
   height: 280px;
-  background: var(--bg-hero) url("../assets/bg.webp") center 65% / cover no-repeat;
+  background: var(--bg-dark); /* animated Unicorn scene sits on top; no static image here anymore */
   display: flex;
   align-items: flex-end;
+  overflow: hidden;
+}
+.footer__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.footer__bg.is-ready { opacity: 1; }
+.footer__bg canvas { display: block; width: 100% !important; height: 100% !important; }
+/* keep the clock/copyright readable over the scene */
+.footer__band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent 70%);
 }
 .footer__band-row {
   width: 100%;
@@ -1294,6 +1360,7 @@ body.menu-open { overflow: hidden; }
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 2; /* lime glow above the scene + scrim */
   background: radial-gradient(60% 90% at 50% 100%, rgba(174, 203, 57, 0.5), transparent 70%);
   mix-blend-mode: screen;
   pointer-events: none;
@@ -1303,7 +1370,7 @@ body.menu-open { overflow: hidden; }
   0%, 100% { opacity: 0.1; }
   50% { opacity: 0.4; }
 }
-.footer__band-row { position: relative; }
+.footer__band-row { position: relative; z-index: 3; } /* clock/copyright above scene, scrim and glow */
 
 /* Crosshair cursor: full-viewport hairlines meeting at the pointer + x/y readout.
    difference blend keeps the lines visible on both dark and light sections. */

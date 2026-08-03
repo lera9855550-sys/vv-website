@@ -600,3 +600,44 @@ if (motionOK && lazyVideos.length && "IntersectionObserver" in window) {
   );
   lazyVideos.forEach((v) => videoIO.observe(v));
 }
+
+// Animated Unicorn Studio backgrounds (hero + footer), each over a dark base. Progressive
+// enhancement: skipped entirely for reduced-motion. The WebGL SDK is loaded once on demand so it
+// never blocks first paint; a lighter render scale is used on phones/tablets. The hero starts
+// immediately (above the fold); the footer lazy-loads only when scrolled near, to save GPU and
+// keep the second scene off the network until it's actually needed. pointer-events:none lets
+// clicks/scroll pass through.
+const sceneTargets = [
+  { id: "hero-bg", lazy: false },
+  { id: "footer-bg", lazy: true },
+].filter((t) => document.getElementById(t.id));
+
+if (sceneTargets.length && motionOK) {
+  const startScenes = () => {
+    if (!window.UnicornStudio || !window.UnicornStudio.addScene) return;
+    sceneTargets.forEach((t) => {
+      const el = document.getElementById(t.id);
+      window.UnicornStudio.addScene({
+        elementId: t.id,
+        filePath: "assets/hero-scene.json", // self-hosted scene — no dependency on Unicorn's servers/subscription
+        scale: finePointer ? 1 : 0.6, // lower internal resolution on touch devices
+        dpi: 1.5,
+        fps: 60,
+        lazyLoad: t.lazy,
+        production: true,
+      })
+        .then(() => el.classList.add("is-ready"))
+        .catch(() => {}); // on failure the dark base / hero poster just stays
+    });
+  };
+
+  if (window.UnicornStudio && window.UnicornStudio.addScene) {
+    startScenes();
+  } else {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8/dist/unicornStudio.umd.js";
+    s.async = true;
+    s.onload = startScenes;
+    document.head.appendChild(s);
+  }
+}

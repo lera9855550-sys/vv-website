@@ -7,12 +7,16 @@
   <meta name="description" content="We design change-making website and brand experiences that finally match the business behind them.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net"> <!-- Unicorn Studio SDK -->
+  <!-- Start the animated-background chain at page-parse time (not after deferred main.js) so the
+       scene appears as soon as possible: fetch the SDK, scene JSON and glyph texture in parallel. -->
+  <link rel="preload" href="assets/hero-scene.json" as="fetch" crossorigin="anonymous">
+  <link rel="preload" href="assets/glyph-lines.png" as="image">
+  <script defer src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8/dist/unicornStudio.umd.js"></script>
   <!-- load font CSS without blocking first paint -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap"></noscript>
-  <!-- LCP hero background — start fetching from the HTML, not after CSS parse -->
-  <link rel="preload" as="image" href="assets/bg.webp" fetchpriority="high">
   <link rel="stylesheet" href="css/styles.css">
   <!-- Large-screen scaling. Up to START the design renders 1:1 exactly as drawn (laptops and
        1080p monitors — no zoom at all). Only genuinely large displays (1440p, ultrawide, 4K) get
@@ -46,6 +50,10 @@
 
   <!-- ============ HERO ============ -->
   <section class="hero" id="top">
+    <!-- Animated Unicorn Studio fog, layered over the static bg.webp (which stays as the
+         poster/fallback for slow loads, reduced-motion and failures). Initialised by main.js. -->
+    <div id="hero-bg" class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__scrim" aria-hidden="true"></div>
     <div class="grid-lines" aria-hidden="true"></div>
 
     <header class="header">
@@ -503,6 +511,7 @@
     </div>
 
     <div class="footer__band">
+      <div id="footer-bg" class="footer__bg" aria-hidden="true"></div>
       <div class="footer__band-row">
         <div class="footer__clock">
           <p><span data-kyiv-time>Kyiv City 05:35:01 PM</span></p>
