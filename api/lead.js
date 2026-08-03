@@ -8,7 +8,12 @@
 //   TG_CHAT     — chat id to send leads to
 //   SHEETS_URL  — (optional) Google Apps Script web-app URL that appends a row to a spreadsheet
 
-const ALLOWED_ORIGIN = "https://lera9855550-sys.github.io"; // only this site may call it
+// The site is served from both GitHub Pages and Vercel, so accept either origin.
+const ALLOWED_ORIGINS = new Set([
+  "https://lera9855550-sys.github.io",
+  "https://vv-website-delta.vercel.app",
+]);
+const DEFAULT_ORIGIN = "https://lera9855550-sys.github.io";
 const MAX_BODY = 20 * 1024; // reject payloads larger than 20KB
 const LIMITS = { first_name: 100, last_name: 100, company: 150, email: 200, budget: 40, description: 3000 };
 
@@ -29,8 +34,9 @@ function clean(v, max) {
 
 export default async function handler(req, res) {
   const origin = req.headers.origin;
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : DEFAULT_ORIGIN;
 
-  res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  res.setHeader("Access-Control-Allow-Origin", allowOrigin); // must echo the caller's origin for CORS
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Vary", "Origin");
@@ -40,7 +46,7 @@ export default async function handler(req, res) {
 
   // Hard origin gate — CORS headers only constrain browsers. A browser on another site is
   // rejected here; a raw curl can omit Origin, which is why the rate limit below also exists.
-  if (origin && origin !== ALLOWED_ORIGIN) return res.status(403).json({ ok: false, error: "origin" });
+  if (origin && !ALLOWED_ORIGINS.has(origin)) return res.status(403).json({ ok: false, error: "origin" });
 
   // Rate limit by client IP (best effort)
   const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
