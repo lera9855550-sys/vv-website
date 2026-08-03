@@ -533,7 +533,7 @@ if (motionOK) {
 // After deploying the function on Vercel, paste its URL below.
 const leadForm = document.getElementById("lead-form");
 if (leadForm) {
-  const LEAD_ENDPOINT = "https://REPLACE-ME.vercel.app/api/lead"; // ← paste your Vercel URL here
+  const LEAD_ENDPOINT = "https://vv-website-delta.vercel.app/api/lead";
   const statusEl = leadForm.querySelector("[data-form-status]");
   const submitBtn = leadForm.querySelector("button[type=submit]");
   const btnLabel = submitBtn && submitBtn.querySelector("span");
