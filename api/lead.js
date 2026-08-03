@@ -94,11 +94,19 @@ export default async function handler(req, res) {
   let delivered = false;
 
   try {
+    const tgBody = {
+      chat_id: process.env.TG_CHAT,
+      text: text.slice(0, 4096), // guards Telegram's hard message-length limit so a lead is never dropped
+      disable_web_page_preview: true,
+    };
+    // If the spreadsheet's view URL is configured, attach an "open the leads sheet" button.
+    if (process.env.SHEET_URL) {
+      tgBody.reply_markup = { inline_keyboard: [[{ text: "📊 Открыть таблицу заявок", url: process.env.SHEET_URL }]] };
+    }
     const tg = await fetch(`https://api.telegram.org/bot${process.env.TG_TOKEN}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      // slice(0, 4096) guards Telegram's hard message-length limit so a valid lead is never dropped
-      body: JSON.stringify({ chat_id: process.env.TG_CHAT, text: text.slice(0, 4096), disable_web_page_preview: true }),
+      body: JSON.stringify(tgBody),
     });
     if (tg.ok) delivered = true;
   } catch {}
