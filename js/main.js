@@ -502,12 +502,10 @@ if (motionOK && finePointer) {
   cross.className = "cursor-cross";
   cross.innerHTML =
     '<span class="cursor-cross__x"></span>' +
-    '<span class="cursor-cross__y"></span>' +
-    '<span class="cursor-cross__dot"><span class="cursor-cross__label">View</span></span>';
+    '<span class="cursor-cross__y"></span>';
   document.body.appendChild(cross);
   const lineX = cross.querySelector(".cursor-cross__x");
   const lineY = cross.querySelector(".cursor-cross__y");
-  const dot = cross.querySelector(".cursor-cross__dot");
 
   let mx = -100, my = -100, cx = -100, cy = -100;
 
@@ -519,11 +517,9 @@ if (motionOK && finePointer) {
     mx = e.clientX / z;
     my = e.clientY / z;
     cross.classList.add("is-visible");
-    // The cross responds to what it's over: accent + dot on any interactive element,
-    // and the dot grows into a "View" badge over the portfolio cards.
+    // The hairlines pick up the accent over any interactive element.
     const hit = e.target.closest("a, button, select, input, textarea, label, summary");
     cross.classList.toggle("is-link", !!hit);
-    cross.classList.toggle("is-view", !!(hit && hit.closest(".work-card")));
   });
   document.addEventListener("mouseleave", () => cross.classList.remove("is-visible"));
 
@@ -532,8 +528,6 @@ if (motionOK && finePointer) {
     cy += (my - cy) * 0.35;
     lineX.style.transform = `translateY(${cy}px)`;
     lineY.style.transform = `translateX(${cx}px)`;
-    dot.style.left = cx + "px";
-    dot.style.top = cy + "px";
     requestAnimationFrame(follow);
   };
   follow();

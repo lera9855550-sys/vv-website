@@ -1454,35 +1454,9 @@ body.menu-open { overflow: hidden; }
 }
 .cursor-cross__x,
 .cursor-cross__y { transition: background 0.25s ease; }
-/* Over interactive elements the hairlines pick up the accent and a dot marks the crossing;
-   over a portfolio card the dot grows into a "View" badge. JS positions the dot (left/top),
-   CSS owns the scale so the transitions stay smooth. */
+/* Over interactive elements the hairlines pick up the accent */
 .cursor-cross.is-link .cursor-cross__x,
 .cursor-cross.is-link .cursor-cross__y { background: rgba(222, 248, 118, 0.5); }
-.cursor-cross__dot {
-  position: absolute;
-  width: 64px;
-  height: 64px;
-  margin: -32px 0 0 -32px;
-  border-radius: 50%;
-  background: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: scale(0);
-  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-.cursor-cross.is-link .cursor-cross__dot { transform: scale(0.14); }
-.cursor-cross.is-view .cursor-cross__dot { transform: scale(1); }
-.cursor-cross__label {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.28px;
-  color: #000;
-  opacity: 0;
-  transition: opacity 0.2s ease 0.08s;
-}
-.cursor-cross.is-view .cursor-cross__label { opacity: 1; }
 /* Page transition fade */
 .page-fade {
   position: fixed;
