@@ -541,6 +541,9 @@ if (motionOK && finePointer) {
 // Built entirely in JS so a no-JS visitor can never get stuck behind it.
 if (motionOK && !sessionStorage.getItem("vv-loader-shown")) {
   sessionStorage.setItem("vv-loader-shown", "1");
+  // Hold the hero entrance (title lines, subtitle, card, header) while the loader covers the
+  // screen, so it plays in view as the dark dissolves instead of finishing unseen behind it.
+  document.documentElement.classList.add("is-loading");
   const loader = document.createElement("div");
   loader.className = "loader";
   loader.setAttribute("aria-hidden", "true");
@@ -548,10 +551,13 @@ if (motionOK && !sessionStorage.getItem("vv-loader-shown")) {
     '<span class="loader__x"></span>' +
     '<span class="loader__y"></span>';
   document.body.appendChild(loader);
-  // draw → lift, ~1.2s total
+  // draw → dissolve (hero entrance released at the same moment), ~1.4s total
   requestAnimationFrame(() => requestAnimationFrame(() => loader.classList.add("is-drawn")));
-  setTimeout(() => loader.classList.add("is-done"), 700);
-  setTimeout(() => loader.remove(), 1400);
+  setTimeout(() => {
+    loader.classList.add("is-done");
+    document.documentElement.classList.remove("is-loading");
+  }, 700);
+  setTimeout(() => loader.remove(), 1600);
 }
 
 // Page transition fade

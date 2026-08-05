@@ -1464,7 +1464,7 @@ body.menu-open { overflow: hidden; }
   z-index: 500;
   background: #0e100c;
   pointer-events: none;
-  transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+  transition: opacity 0.8s ease;
 }
 .loader__x {
   position: absolute;
@@ -1490,7 +1490,13 @@ body.menu-open { overflow: hidden; }
 }
 .loader.is-drawn .loader__x { transform: scaleX(1); }
 .loader.is-drawn .loader__y { transform: scaleY(1); }
-.loader.is-done { transform: translateY(-100%); }
+/* Reveal: the dark and its hairlines simply dissolve while the hero entrance plays beneath */
+.loader.is-done { opacity: 0; }
+/* The hero entrance waits under the loader and is released as the dissolve starts */
+.is-loading .hero .hero__line,
+.is-loading .hero .hero__subtitle,
+.is-loading .hero .hero__card,
+.is-loading .header { animation-play-state: paused; }
 
 /* Page transition fade */
 .page-fade {
