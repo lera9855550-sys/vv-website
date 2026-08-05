@@ -1457,6 +1457,56 @@ body.menu-open { overflow: hidden; }
 /* Over interactive elements the hairlines pick up the accent */
 .cursor-cross.is-link .cursor-cross__x,
 .cursor-cross.is-link .cursor-cross__y { background: rgba(222, 248, 118, 0.5); }
+/* First-visit loader: crosshair hairlines draw in, meet with an accent flash, curtain lifts */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: #0e100c;
+  pointer-events: none;
+  transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.loader__x {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.35);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.loader__y {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.35);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0.08s;
+}
+.loader__dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.18s ease, transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.loader.is-drawn .loader__x { transform: scaleX(1); }
+.loader.is-drawn .loader__y { transform: scaleY(1); }
+.loader.is-flash .loader__dot { opacity: 1; transform: scale(1.6); }
+.loader.is-done { transform: translateY(-100%); }
+.loader.is-done .loader__dot { opacity: 0; }
+
 /* Page transition fade */
 .page-fade {
   position: fixed;

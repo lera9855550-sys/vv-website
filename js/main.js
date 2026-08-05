@@ -535,6 +535,27 @@ if (motionOK && finePointer) {
 
 // (Wheel damping now lives in the shared smoothScroll controller near the top of this file.)
 
+// First-visit loader: the two crosshair hairlines draw in from the screen edges, meet in the
+// middle with a brief accent flash, then the curtain lifts to reveal the page. Runs once per
+// tab session (later navigations use the lighter page fade); skipped for reduced motion.
+// Built entirely in JS so a no-JS visitor can never get stuck behind it.
+if (motionOK && !sessionStorage.getItem("vv-loader-shown")) {
+  sessionStorage.setItem("vv-loader-shown", "1");
+  const loader = document.createElement("div");
+  loader.className = "loader";
+  loader.setAttribute("aria-hidden", "true");
+  loader.innerHTML =
+    '<span class="loader__x"></span>' +
+    '<span class="loader__y"></span>' +
+    '<span class="loader__dot"></span>';
+  document.body.appendChild(loader);
+  // draw → flash → lift, ~1.2s total
+  requestAnimationFrame(() => requestAnimationFrame(() => loader.classList.add("is-drawn")));
+  setTimeout(() => loader.classList.add("is-flash"), 520);
+  setTimeout(() => loader.classList.add("is-done"), 760);
+  setTimeout(() => loader.remove(), 1500);
+}
+
 // Page transition fade
 if (motionOK) {
   const fade = document.createElement("div");
