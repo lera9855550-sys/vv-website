@@ -651,9 +651,11 @@ function startMenuScene() {
   if (menuSceneStarted || !motionOK) return;
   const el = document.getElementById("menu-bg");
   if (!el) return;
+  // Set the flag before any async work: if the SDK is still downloading and the user re-opens
+  // the menu, a second call must not inject a second <script> / attach a duplicate scene.
+  menuSceneStarted = true;
   const add = () => {
     if (!window.UnicornStudio || !window.UnicornStudio.addScene) return;
-    menuSceneStarted = true;
     window.UnicornStudio.addScene({
       elementId: "menu-bg",
       filePath: "assets/hero-scene.json",

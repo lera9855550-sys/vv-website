@@ -47,6 +47,15 @@
   </script>
   <!-- Vercel Web Analytics (works on the vanilla site via this script; enable it in the Vercel dashboard) -->
   <script defer src="/_vercel/insights/script.js"></script>
+  <!-- Without JS the statement text (base #323232, revealed by a JS-injected gradient span) and
+       the FAQ answers (font-size:0, sized by a JS-created wrapper) are invisible. Restore
+       readable static styles for no-JS users. -->
+  <noscript>
+    <style>
+      .statement__text { color: rgba(255, 255, 255, 0.8); }
+      .faq__answer { display: block; font-size: 18px; line-height: 1.3; opacity: 1; padding-top: 12px; }
+    </style>
+  </noscript>
 </head>
 <body>
 
