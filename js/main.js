@@ -534,7 +534,9 @@ if (motionOK) {
 // After deploying the function on Vercel, paste its URL below.
 const leadForm = document.getElementById("lead-form");
 if (leadForm) {
-  const LEAD_ENDPOINT = "https://vv-website-delta.vercel.app/api/lead";
+  // Absolute (not relative) so the form also works from mirrors on other hosts
+  // (e.g. the GitHub Pages copy), which have no /api of their own.
+  const LEAD_ENDPOINT = "https://vvgallery.tech/api/lead";
   const statusEl = leadForm.querySelector("[data-form-status]");
   const submitBtn = leadForm.querySelector("button[type=submit]");
   const btnLabel = submitBtn && submitBtn.querySelector("span");
