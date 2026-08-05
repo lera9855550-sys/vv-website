@@ -462,6 +462,25 @@ if (hero && motionOK) {
   );
 }
 
+// Services media: subtle depth — the floating photo lags the scroll by a few percent.
+// The offset is applied to the inner img (the container's translateY(-50%) does positioning),
+// relative to how far the section has travelled through the viewport.
+const svcMediaBox = document.querySelector(".services__media");
+if (svcMediaBox && motionOK && finePointer) {
+  const imgs = svcMediaBox.querySelectorAll("img");
+  window.addEventListener(
+    "scroll",
+    () => {
+      const r = svcMediaBox.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) return; // off-screen — skip the work
+      const progress = (r.top + r.height / 2) / window.innerHeight - 0.5; // -0.5..0.5 around center
+      const shift = Math.round(progress * -48); // counter-scroll ≤ ~24px each way
+      imgs.forEach((im) => (im.style.transform = `translate(-50%, calc(-50% + ${shift}px))`));
+    },
+    { passive: true }
+  );
+}
+
 // Touch devices: scroll-driven "hover" for work cards — a card crossing the middle band
 // of the viewport gets .is-hovered (blur + preview panel + caption), released on exit.
 if (window.matchMedia("(hover: none)").matches) {
@@ -483,10 +502,12 @@ if (motionOK && finePointer) {
   cross.className = "cursor-cross";
   cross.innerHTML =
     '<span class="cursor-cross__x"></span>' +
-    '<span class="cursor-cross__y"></span>';
+    '<span class="cursor-cross__y"></span>' +
+    '<span class="cursor-cross__dot"><span class="cursor-cross__label">View</span></span>';
   document.body.appendChild(cross);
   const lineX = cross.querySelector(".cursor-cross__x");
   const lineY = cross.querySelector(".cursor-cross__y");
+  const dot = cross.querySelector(".cursor-cross__dot");
 
   let mx = -100, my = -100, cx = -100, cy = -100;
 
@@ -498,6 +519,11 @@ if (motionOK && finePointer) {
     mx = e.clientX / z;
     my = e.clientY / z;
     cross.classList.add("is-visible");
+    // The cross responds to what it's over: accent + dot on any interactive element,
+    // and the dot grows into a "View" badge over the portfolio cards.
+    const hit = e.target.closest("a, button, select, input, textarea, label, summary");
+    cross.classList.toggle("is-link", !!hit);
+    cross.classList.toggle("is-view", !!(hit && hit.closest(".work-card")));
   });
   document.addEventListener("mouseleave", () => cross.classList.remove("is-visible"));
 
@@ -506,6 +532,8 @@ if (motionOK && finePointer) {
     cy += (my - cy) * 0.35;
     lineX.style.transform = `translateY(${cy}px)`;
     lineY.style.transform = `translateX(${cx}px)`;
+    dot.style.left = cx + "px";
+    dot.style.top = cy + "px";
     requestAnimationFrame(follow);
   };
   follow();

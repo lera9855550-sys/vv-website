@@ -103,7 +103,8 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 .btn--bordered:hover { border-color: var(--accent); }
 .btn--bordered { border: 1px solid var(--border-light); width: 334px; max-width: 100%; }
 .btn__icon { width: 52px; height: 52px; flex-shrink: 0; }
-.btn__icon img { width: 100%; height: 100%; transition: transform 0.15s ease; }
+.btn__icon img { width: 100%; height: 100%; transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1); }
+.btn:hover .btn__icon img { transform: translateX(5px); }
 
 /* ============ Header ============ */
 .header {
@@ -164,8 +165,21 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   font-weight: 500;
   letter-spacing: -0.32px;
 }
-.menu a { opacity: 1; transition: opacity 0.15s ease; }
-.menu a:hover { opacity: 0.6; }
+.menu a { position: relative; opacity: 1; transition: opacity 0.15s ease; }
+/* Hairline slides in from the left on hover, retreats to the right on leave */
+.menu a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.menu a:hover::after { transform: scaleX(1); transform-origin: left; }
 .header__cta { width: 334px; flex-shrink: 0; }
 .menu-toggle { display: none; }
 
@@ -1438,6 +1452,37 @@ body.menu-open { overflow: hidden; }
   width: 1px;
   background: rgba(255, 255, 255, 0.22);
 }
+.cursor-cross__x,
+.cursor-cross__y { transition: background 0.25s ease; }
+/* Over interactive elements the hairlines pick up the accent and a dot marks the crossing;
+   over a portfolio card the dot grows into a "View" badge. JS positions the dot (left/top),
+   CSS owns the scale so the transitions stay smooth. */
+.cursor-cross.is-link .cursor-cross__x,
+.cursor-cross.is-link .cursor-cross__y { background: rgba(222, 248, 118, 0.5); }
+.cursor-cross__dot {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0);
+  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.cursor-cross.is-link .cursor-cross__dot { transform: scale(0.14); }
+.cursor-cross.is-view .cursor-cross__dot { transform: scale(1); }
+.cursor-cross__label {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.28px;
+  color: #000;
+  opacity: 0;
+  transition: opacity 0.2s ease 0.08s;
+}
+.cursor-cross.is-view .cursor-cross__label { opacity: 1; }
 /* Page transition fade */
 .page-fade {
   position: fixed;
