@@ -1488,24 +1488,9 @@ body.menu-open { overflow: hidden; }
   transform-origin: top;
   transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0.08s;
 }
-.loader__dot {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 50%;
-  background: var(--accent);
-  opacity: 0;
-  transform: scale(0.3);
-  transition: opacity 0.18s ease, transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
 .loader.is-drawn .loader__x { transform: scaleX(1); }
 .loader.is-drawn .loader__y { transform: scaleY(1); }
-.loader.is-flash .loader__dot { opacity: 1; transform: scale(1.6); }
 .loader.is-done { transform: translateY(-100%); }
-.loader.is-done .loader__dot { opacity: 0; }
 
 /* Page transition fade */
 .page-fade {

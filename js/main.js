@@ -546,14 +546,12 @@ if (motionOK && !sessionStorage.getItem("vv-loader-shown")) {
   loader.setAttribute("aria-hidden", "true");
   loader.innerHTML =
     '<span class="loader__x"></span>' +
-    '<span class="loader__y"></span>' +
-    '<span class="loader__dot"></span>';
+    '<span class="loader__y"></span>';
   document.body.appendChild(loader);
-  // draw → flash → lift, ~1.2s total
+  // draw → lift, ~1.2s total
   requestAnimationFrame(() => requestAnimationFrame(() => loader.classList.add("is-drawn")));
-  setTimeout(() => loader.classList.add("is-flash"), 520);
-  setTimeout(() => loader.classList.add("is-done"), 760);
-  setTimeout(() => loader.remove(), 1500);
+  setTimeout(() => loader.classList.add("is-done"), 700);
+  setTimeout(() => loader.remove(), 1400);
 }
 
 // Page transition fade
