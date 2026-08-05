@@ -44,13 +44,22 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ ok: false, error: "method" });
 
-  // Hard origin gate — CORS headers only constrain browsers. A browser on another site is
-  // rejected here; a raw curl can omit Origin, which is why the rate limit below also exists.
-  if (origin && !ALLOWED_ORIGINS.has(origin)) return res.status(403).json({ ok: false, error: "origin" });
+  // Hard origin gate — CORS headers only constrain browsers. The real form always sends an
+  // Origin header (fetch POST), so a missing Origin means a non-browser client: reject it
+  // rather than letting curl/scripts skip the gate entirely.
+  if (!ALLOWED_ORIGINS.has(origin)) return res.status(403).json({ ok: false, error: "origin" });
 
-  // Rate limit by client IP (best effort)
-  const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
+  // Rate limit by client IP (best effort). x-real-ip is set by Vercel's edge and can't be
+  // spoofed by the caller, unlike the leftmost x-forwarded-for value.
+  const ip =
+    String(req.headers["x-real-ip"] || "").trim() ||
+    String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() ||
+    "unknown";
   const now = Date.now();
+  // Sweep expired windows so the map can't grow without bound in a warm instance.
+  if (HITS.size > 1000) {
+    for (const [k, v] of HITS) if (now - v.start > RL_WINDOW) HITS.delete(k);
+  }
   const rec = HITS.get(ip);
   if (!rec || now - rec.start > RL_WINDOW) HITS.set(ip, { start: now, n: 1 });
   else if (rec.n >= RL_MAX) return res.status(429).json({ ok: false, error: "rate" });

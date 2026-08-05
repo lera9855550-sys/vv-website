@@ -1062,7 +1062,9 @@ body.menu-open { overflow: hidden; }
   z-index: 100;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* No justify-content:space-between here: combined with overflow-y:auto it clips overflowing
+     content ABOVE the scroll origin on short viewports (landscape phones), stranding the close
+     button off-screen. margin-top:auto on __bottom gives the same layout without the trap. */
   padding: 24px 16px 36px;
   background: #0e100c; /* dark base, same as the hero — the animated scene fades in over it */
   opacity: 0;
@@ -1139,7 +1141,7 @@ body.menu-open { overflow: hidden; }
 .mobile-menu__links a:hover .mobile-menu__arrow,
 .mobile-menu__links a:active .mobile-menu__arrow { opacity: 1; }
 
-.mobile-menu__bottom { display: flex; flex-direction: column; gap: 16px; }
+.mobile-menu__bottom { display: flex; flex-direction: column; gap: 16px; margin-top: auto; padding-top: 40px; }
 .mobile-menu__socials { display: flex; gap: 4px; }
 .mobile-menu__socials a {
   flex: 1;
@@ -1156,6 +1158,20 @@ body.menu-open { overflow: hidden; }
 }
 .mobile-menu__socials a:hover { background: rgba(255, 255, 255, 0.1); }
 .mobile-menu__socials img { width: 32px; height: 32px; }
+
+/* ============ Tablet / small laptop (901–1300px) ============ */
+/* The layout is designed for a 1360px canvas; between the mobile breakpoint and ~1300px the
+   fixed-width absolute pieces start colliding. Shrink/cap them so nothing overlaps. */
+@media (min-width: 901px) and (max-width: 1300px) {
+  /* Hero: smaller title, lifted fully above the glass card so the last line can't run under it */
+  .hero__title { font-size: 64px; letter-spacing: -3.84px; bottom: 348px; }
+
+  /* Services: cap the floating media so it can't reach the testimonial column on the left */
+  .services__media { width: min(507px, 40vw); height: auto; aspect-ratio: 507 / 408; }
+
+  /* The 176px column gap starves the content column at this width */
+  .statement__inner, .services__inner { gap: 80px; }
+}
 
 /* ============ Mobile ============ */
 @media (max-width: 900px) {

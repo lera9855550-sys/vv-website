@@ -11,6 +11,15 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(200).send("ok");
 
+  // Only Telegram may drive the bot. setWebhook was registered with a secret_token, which
+  // Telegram echoes back in this header on every delivery; without this check anyone could
+  // POST forged updates here and make the bot leak leads (/find, /last) into their own chat
+  // or trigger destructive commands (/cleartests). Forged requests get 403.
+  const secret = req.headers["x-telegram-bot-api-secret-token"];
+  if (!process.env.TG_WEBHOOK_SECRET || secret !== process.env.TG_WEBHOOK_SECRET) {
+    return res.status(403).send("forbidden");
+  }
+
   try {
     // Vercel parses JSON bodies automatically; fall back to a string body just in case.
     const update = typeof req.body === "string" ? req.body : JSON.stringify(req.body || {});
