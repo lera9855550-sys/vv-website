@@ -8,8 +8,10 @@
 //   TG_CHAT     — chat id to send leads to
 //   SHEETS_URL  — (optional) Google Apps Script web-app URL that appends a row to a spreadsheet
 
-// The site is served from both GitHub Pages and Vercel, so accept either origin.
+// Every origin the site is served from (custom domain, Vercel URL, GitHub Pages copy).
 const ALLOWED_ORIGINS = new Set([
+  "https://vvgallery.tech",
+  "https://www.vvgallery.tech",
   "https://lera9855550-sys.github.io",
   "https://vv-website-delta.vercel.app",
 ]);
