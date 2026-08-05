@@ -491,8 +491,12 @@ if (motionOK && finePointer) {
   let mx = -100, my = -100, cx = -100, cy = -100;
 
   window.addEventListener("mousemove", (e) => {
-    mx = e.clientX;
-    my = e.clientY;
+    // On >1920px screens the large-screen scaler sets root zoom; pointer coords arrive in
+    // unzoomed pixels while the hairlines are laid out in zoomed ones — divide by the zoom
+    // so the cross stays exactly under the pointer.
+    const z = parseFloat(document.documentElement.style.zoom) || 1;
+    mx = e.clientX / z;
+    my = e.clientY / z;
     cross.classList.add("is-visible");
   });
   document.addEventListener("mouseleave", () => cross.classList.remove("is-visible"));
