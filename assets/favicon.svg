@@ -1,9 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
   <rect width="52" height="52" rx="6" fill="#DEF876"/>
-  <!-- the brand's pixel arrow, enlarged for 16px legibility -->
-  <g transform="translate(26 26.276) scale(1.25) translate(-26 -26.276)">
-    <path d="M30.276 36.276H26.276V32.276H30.276V36.276Z" fill="#000"/>
-    <path d="M34.276 24.276H38.276V28.276H34.276V32.276H30.276V28.276H14.276V24.276H30.276V20.276H34.276V24.276Z" fill="#000"/>
-    <path d="M30.276 20.276H26.276V16.276H30.276V20.276Z" fill="#000"/>
-  </g>
+  <!-- the V+V mark from logo.svg, centered on the tile -->
+  <path fill="#000" transform="translate(4 21.9) scale(0.4747)" d="M11.404 0H0l27.229 17.77h12.416V0H27.262L21.56 4.325h8.806v8.08zM47.293 2.481V6.64h-5.06v4.392h5.06v4.191h5.331v-4.191h4.994V6.639h-4.994V2.48zM64.407 0H53.002l27.229 17.77h12.416V0H80.265l-5.703 4.325h8.807v8.08z"/>
 </svg>
