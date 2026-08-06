@@ -127,44 +127,21 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
    JS drops the animation once it has played so the hide/show transform can take over */
 .header.is-ready { animation: none; opacity: 1; }
 
-/* Soft top scrim behind the bar so the white nav/logo stay legible over the bright animated
-   scene — a gradient that fades to nothing (not a solid pill). Hidden over light sections where
-   the bar already inverts to black. It's a header child so it hides together with the bar. */
-.header::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 130px;
-  z-index: -1; /* behind the nav/logo, above page content */
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15) 55%, transparent);
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-.header--on-light::before { opacity: 0; } /* no dark scrim over light sections */
-
-/* Frosted-glass strip once the page is scrolled: blurs whatever passes under the bar and
-   dissolves at its lower edge via the mask (no hard line). Tint follows the bar's inversion. */
+/* Plain frosted strip behind the bar once the page is scrolled: a uniform backdrop blur over
+   the header band — no gradients, masks, shadows or transitions. Tint follows the inversion. */
 .header::after {
   content: "";
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  /* Solid blur must cover the whole bar (top 22px + 60px high) with margin before the mask
-     starts fading, or the dissolve cuts visible blotches across the header items. */
-  height: 150px;
-  z-index: -2; /* under the ::before scrim, above page content */
+  height: 104px; /* the full header band: 22px offset + 60px bar + 22px below */
+  z-index: -1; /* behind the nav/logo, above page content */
   pointer-events: none;
   background: rgba(14, 16, 12, 0.28);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
-  -webkit-mask-image: linear-gradient(to bottom, #000 66%, transparent);
-  mask-image: linear-gradient(to bottom, #000 66%, transparent);
   opacity: 0;
-  transition: opacity 0.3s ease;
 }
 .header.is-scrolled::after { opacity: 1; }
 .header--on-light::after { background: rgba(248, 248, 248, 0.35); } /* light tint over light sections */
@@ -189,21 +166,9 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   font-weight: 500;
   letter-spacing: -0.32px;
 }
-.menu a { position: relative; opacity: 1; transition: opacity 0.15s ease; }
-/* Hairline slides in from the left on hover, retreats to the right on leave */
-.menu a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -6px;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-.menu a:hover::after { transform: scaleX(1); transform-origin: left; }
+.menu a { transition: color 0.15s ease; }
+.menu a:hover { color: var(--accent); }
+.header--on-light .menu a:hover { color: var(--accent-text); } /* darker lime for contrast on light */
 .header__cta { width: 334px; flex-shrink: 0; }
 .menu-toggle { display: none; }
 
