@@ -145,6 +145,28 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 }
 .header--on-light::before { opacity: 0; } /* no dark scrim over light sections */
 
+/* Frosted-glass strip once the page is scrolled: blurs whatever passes under the bar and
+   dissolves at its lower edge via the mask (no hard line). Tint follows the bar's inversion. */
+.header::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 104px;
+  z-index: -2; /* under the ::before scrim, above page content */
+  pointer-events: none;
+  background: rgba(14, 16, 12, 0.28);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.header.is-scrolled::after { opacity: 1; }
+.header--on-light::after { background: rgba(248, 248, 248, 0.35); } /* light tint over light sections */
+
 /* No backdrop — instead the bar inverts over light sections (JS toggles .header--on-light):
    white logo/nav/button on dark, black on the light #work / #pricing sections. */
 .menu a,

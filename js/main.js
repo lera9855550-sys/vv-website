@@ -130,6 +130,7 @@ document.addEventListener("click", (e) => {
     }
     if (y <= TOP_ZONE) header.classList.remove("is-hidden");
     else if (Math.abs(diff) > DELTA) header.classList.toggle("is-hidden", diff > 0);
+    header.classList.toggle("is-scrolled", y > TOP_ZONE); // frosted backdrop once off the top
     lastY = y;
   };
 
