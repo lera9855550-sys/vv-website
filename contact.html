@@ -17,16 +17,35 @@
   <script>
     (function () {
       var START = 1920, CONTENT = 1360, MINPAD = 40, MAXZOOM = 2, root = document.documentElement;
+      var legacy = false; // set once a browser proves it can't do standardized css zoom
+      function reset() {
+        root.style.zoom = "";
+        root.style.removeProperty("--pad-x");
+        root.style.removeProperty("--vh");
+      }
+      // Some browsers ignore css `zoom` or implement the legacy variant (rects/innerWidth in
+      // zoomed units). Setting the zoomed paddings there collapses the whole layout, so after
+      // applying zoom we verify a 100px probe actually renders at 100*z visual px — and fall
+      // back to the plain centered layout for good if it doesn't.
+      function zoomApplied(z) {
+        var p = document.createElement("div");
+        p.style.cssText = "position:absolute;width:100px;height:1px;visibility:hidden";
+        root.appendChild(p);
+        var w = p.getBoundingClientRect().width;
+        root.removeChild(p);
+        return Math.abs(w - 100 * z) < 5;
+      }
       function scale() {
+        if (legacy) { reset(); return; }
         var w = window.innerWidth;
-        if (w <= START) {
-          root.style.zoom = "";
-          root.style.removeProperty("--pad-x");
-          root.style.removeProperty("--vh");
-          return;
-        }
+        if (w <= START) { reset(); return; }
         var z = Math.min(MAXZOOM, w / START), canvas = w / z, pad = Math.max(MINPAD, (canvas - CONTENT) / 2);
         root.style.zoom = z;
+        if (!zoomApplied(z) || Math.abs(window.innerWidth - w) > 40) {
+          legacy = true;
+          reset();
+          return;
+        }
         root.style.setProperty("--pad-x", pad + "px");
         root.style.setProperty("--vh", window.innerHeight / z + "px");
       }
