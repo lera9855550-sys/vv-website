@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+  <rect width="52" height="52" rx="6" fill="#DEF876"/>
+  <!-- the brand's pixel arrow, enlarged for 16px legibility -->
+  <g transform="translate(26 26.276) scale(1.25) translate(-26 -26.276)">
+    <path d="M30.276 36.276H26.276V32.276H30.276V36.276Z" fill="#000"/>
+    <path d="M34.276 24.276H38.276V28.276H34.276V32.276H30.276V28.276H14.276V24.276H30.276V20.276H34.276V24.276Z" fill="#000"/>
+    <path d="M30.276 20.276H26.276V16.276H30.276V20.276Z" fill="#000"/>
+  </g>
+</svg>
